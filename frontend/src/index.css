@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+/* ── Animated background with photo ── */
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background-image: url('/bg.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: bgZoom 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgZoom {
+  0%   { transform: scale(1)    rotate(0deg);   background-position: center center; }
+  33%  { transform: scale(1.04) rotate(0.3deg); background-position: 55% 45%; }
+  66%  { transform: scale(1.07) rotate(-0.2deg);background-position: 45% 55%; }
+  100% { transform: scale(1.05) rotate(0.1deg); background-position: 52% 48%; }
+}
+
+/* Dark overlay so the content stays readable */
+.animated-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(10, 20, 60, 0.40) 40%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  animation: overlayPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes overlayPulse {
+  0%   { opacity: 0.85; }
+  50%  { opacity: 1.0;  }
+  100% { opacity: 0.90; }
+}
+
+/* Animated blue light sweep */
+.animated-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(37, 99, 235, 0.12) 30%,
+    rgba(59, 130, 246, 0.08) 50%,
+    transparent 70%
+  );
+  animation: lightSweep 6s ease-in-out infinite alternate;
+}
+
+@keyframes lightSweep {
+  0%   { transform: translateX(-10%) skewX(-5deg); opacity: 0.6; }
+  50%  { transform: translateX(5%)   skewX(2deg);  opacity: 1.0; }
+  100% { transform: translateX(15%)  skewX(-3deg); opacity: 0.7; }
+}
+
+/* ── Floating orbs on top of photo ── */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(55px);
+  mix-blend-mode: screen;
+}
+
+.orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(37,99,235,0.50) 0%, transparent 70%);
+  top: -150px; left: -100px;
+  animation: orbit1 14s ease-in-out infinite alternate;
+}
+
+.orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.20) 0%, transparent 70%);
+  top: 20%; right: -80px;
+  animation: orbit2 18s ease-in-out infinite alternate;
+}
+
+.orb-3 {
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(96,165,250,0.45) 0%, transparent 70%);
+  bottom: -100px; left: 20%;
+  animation: orbit3 16s ease-in-out infinite alternate;
+}
+
+.orb-4 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(30,58,138,0.55) 0%, transparent 70%);
+  top: 45%; left: 5%;
+  animation: orbit4 20s ease-in-out infinite alternate;
+}
+
+.orb-5 {
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  top: 15%; left: 52%;
+  animation: orbit5 10s ease-in-out infinite alternate;
+}
+
+.orb-6 {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(37,99,235,0.40) 0%, transparent 70%);
+  top: -40px; right: 12%;
+  animation: orbit6 12s ease-in-out infinite alternate;
+}
+
+@keyframes orbit1 {
+  0%   { transform: translate(0px,   0px)  scale(1);    }
+  33%  { transform: translate(80px,  60px) scale(1.08); }
+  66%  { transform: translate(40px, 110px) scale(0.95); }
+  100% { transform: translate(100px, 30px) scale(1.12); }
+}
+@keyframes orbit2 {
+  0%   { transform: translate(0px,    0px)  scale(1);    }
+  40%  { transform: translate(-90px,  70px) scale(1.10); }
+  100% { transform: translate(-100px, 40px) scale(1.05); }
+}
+@keyframes orbit3 {
+  0%   { transform: translate(0px,    0px)   scale(1);    }
+  30%  { transform: translate(-70px, -80px)  scale(1.09); }
+  100% { transform: translate(80px,  -50px)  scale(1.07); }
+}
+@keyframes orbit4 {
+  0%   { transform: translate(0px,   0px);   }
+  50%  { transform: translate(100px, -70px); }
+  100% { transform: translate(55px, -110px); }
+}
+@keyframes orbit5 {
+  0%   { transform: translate(0px,   0px)  scale(1);    }
+  50%  { transform: translate(-55px, 80px) scale(1.15); }
+  100% { transform: translate(40px,  45px) scale(0.88); }
+}
+@keyframes orbit6 {
+  0%   { transform: translate(0px,  0px);   }
+  50%  { transform: translate(-80px, 50px); }
+  100% { transform: translate(-40px, 90px); }
+}
+
+/* Seat grid */
+.seat-btn {
+  transition: all 0.15s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #60a5fa; }

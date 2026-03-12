@@ -1,0 +1,122 @@
+-- Drop existing tables
+DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS password_reset_tokens CASCADE;
+DROP TABLE IF EXISTS waitlist CASCADE;
+DROP TABLE IF EXISTS booking_snacks CASCADE;
+DROP TABLE IF EXISTS booking_seats CASCADE;
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS snacks CASCADE;
+DROP TABLE IF EXISTS showtimes CASCADE;
+DROP TABLE IF EXISTS seats CASCADE;
+DROP TABLE IF EXISTS halls CASCADE;
+DROP TABLE IF EXISTS movies CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL DEFAULT '',
+  role TEXT NOT NULL DEFAULT 'user',
+  is_blacklisted BOOLEAN DEFAULT FALSE,
+  customer_number TEXT UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE movies (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  genre TEXT NOT NULL,
+  duration INTEGER NOT NULL,
+  description TEXT DEFAULT '',
+  poster_url TEXT DEFAULT '',
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE halls (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  rows INTEGER NOT NULL DEFAULT 10,
+  seats_per_row INTEGER NOT NULL DEFAULT 10
+);
+
+CREATE TABLE seats (
+  id SERIAL PRIMARY KEY,
+  hall_id INTEGER NOT NULL REFERENCES halls(id) ON DELETE CASCADE,
+  row_label TEXT NOT NULL,
+  seat_number INTEGER NOT NULL,
+  seat_type TEXT NOT NULL DEFAULT 'standard',
+  UNIQUE(hall_id, row_label, seat_number)
+);
+
+CREATE TABLE showtimes (
+  id SERIAL PRIMARY KEY,
+  movie_id INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+  hall_id INTEGER NOT NULL REFERENCES halls(id) ON DELETE CASCADE,
+  datetime TIMESTAMPTZ NOT NULL,
+  price_standard NUMERIC NOT NULL DEFAULT 10.0,
+  price_vip NUMERIC NOT NULL DEFAULT 20.0,
+  price_couple NUMERIC NOT NULL DEFAULT 30.0
+);
+
+CREATE TABLE snacks (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  price NUMERIC NOT NULL,
+  category TEXT DEFAULT 'other',
+  image_url TEXT DEFAULT '',
+  is_available BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE bookings (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  showtime_id INTEGER NOT NULL REFERENCES showtimes(id),
+  reference_number TEXT UNIQUE NOT NULL,
+  total_price NUMERIC NOT NULL,
+  status TEXT DEFAULT 'confirmed',
+  reminder_sent BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE booking_seats (
+  id SERIAL PRIMARY KEY,
+  booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+  seat_id INTEGER NOT NULL REFERENCES seats(id)
+);
+
+CREATE TABLE booking_snacks (
+  id SERIAL PRIMARY KEY,
+  booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+  snack_id INTEGER NOT NULL REFERENCES snacks(id),
+  quantity INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE waitlist (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  showtime_id INTEGER NOT NULL REFERENCES showtimes(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'waiting',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, showtime_id)
+);
+
+CREATE TABLE password_reset_tokens (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT UNIQUE NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE reviews (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  movie_id INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, movie_id)
+);

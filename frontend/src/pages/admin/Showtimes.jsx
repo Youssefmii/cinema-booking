@@ -1,0 +1,127 @@
+import { useEffect, useState } from 'react';
+import api from '../../api';
+import toast from 'react-hot-toast';
+import { Plus, Trash2, X } from 'lucide-react';
+import { format } from 'date-fns';
+
+const emptyForm = { movie_id: '', hall_id: '', datetime: '', price_standard: 12, price_vip: 22, price_couple: 35 };
+
+export default function AdminShowtimes() {
+  const [showtimes, setShowtimes] = useState([]);
+  const [movies, setMovies] = useState([]);
+  const [halls, setHalls] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+
+  const load = () => api.get('/showtimes/all').then(r => setShowtimes(r.data));
+  useEffect(() => {
+    load();
+    api.get('/movies/all').then(r => setMovies(r.data.filter(m => m.is_active)));
+    api.get('/halls').then(r => setHalls(r.data));
+  }, []);
+
+  const save = async e => {
+    e.preventDefault(); setSaving(true);
+    try {
+      await api.post('/showtimes', {
+        ...form,
+        movie_id: Number(form.movie_id), hall_id: Number(form.hall_id),
+        price_standard: Number(form.price_standard), price_vip: Number(form.price_vip), price_couple: Number(form.price_couple),
+      });
+      toast.success('Showtime added'); load(); setModal(false); setForm(emptyForm);
+    } catch (err) { toast.error(err.response?.data?.message || 'Error'); }
+    finally { setSaving(false); }
+  };
+
+  const del = async (id) => {
+    if (!confirm('Delete this showtime?')) return;
+    await api.delete(`/showtimes/${id}`); toast.success('Deleted'); load();
+  };
+
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-slate-800">Showtimes</h1>
+        <button onClick={() => setModal(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-700 text-sm">
+          <Plus size={18}/> Add Showtime
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr>{['Movie', 'Hall', 'Date & Time', 'Standard', 'VIP', 'Couple', 'Action'].map(h => (
+              <th key={h} className="text-left px-4 py-3 text-slate-500 font-semibold text-xs uppercase whitespace-nowrap">{h}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {showtimes.map(st => (
+              <tr key={st.id} className="border-b border-slate-100 hover:bg-slate-50">
+                <td className="px-4 py-3 font-medium text-slate-800">{st.movie_title}</td>
+                <td className="px-4 py-3 text-slate-600">{st.hall_name}</td>
+                <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{format(new Date(st.datetime), 'MMM d, yyyy h:mm a')}</td>
+                <td className="px-4 py-3 text-slate-700">${st.price_standard}</td>
+                <td className="px-4 py-3 text-amber-600">${st.price_vip}</td>
+                <td className="px-4 py-3 text-pink-600">${st.price_couple}</td>
+                <td className="px-4 py-3">
+                  <button onClick={() => del(st.id)} className="p-1.5 text-slate-400 hover:text-red-600"><Trash2 size={16}/></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {showtimes.length === 0 && <div className="text-center py-10 text-slate-400">No showtimes yet</div>}
+      </div>
+
+      {modal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between p-5 border-b border-slate-200">
+              <h2 className="font-bold text-slate-800">Add Showtime</h2>
+              <button onClick={() => setModal(false)}><X size={22} className="text-slate-400"/></button>
+            </div>
+            <form onSubmit={save} className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Movie</label>
+                <select required value={form.movie_id} onChange={e => setForm({...form, movie_id: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <option value="">Select movie</option>
+                  {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Hall</label>
+                <select required value={form.hall_id} onChange={e => setForm({...form, hall_id: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <option value="">Select hall</option>
+                  {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Date & Time</label>
+                <input type="datetime-local" required value={form.datetime} onChange={e => setForm({...form, datetime: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {[['price_standard','Standard ($)'],['price_vip','VIP ($)'],['price_couple','Couple ($)']].map(([k,l]) => (
+                  <div key={k}>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">{l}</label>
+                    <input type="number" min="0" step="0.5" required value={form[k]} onChange={e => setForm({...form, [k]: e.target.value})}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setModal(false)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-medium">Cancel</button>
+                <button type="submit" disabled={saving} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-medium disabled:opacity-70">
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
