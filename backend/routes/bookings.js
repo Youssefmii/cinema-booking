@@ -6,6 +6,13 @@ const { sendBookingConfirmation, sendCancellationEmail, sendWaitlistNotification
 
 const router = express.Router();
 
+// Parse numeric fields from PostgreSQL NUMERIC columns
+const parseBooking = b => ({
+  ...b,
+  total_price: parseFloat(b.total_price) || 0,
+});
+const parseSnackInBooking = s => ({ ...s, price: parseFloat(s.price) || 0 });
+
 router.post('/', authenticate, async (req, res) => {
   try {
     // Block blacklisted users from booking directly
@@ -114,7 +121,7 @@ router.get('/my', authenticate, async (req, res) => {
         pool.query('SELECT se.* FROM booking_seats bs JOIN seats se ON bs.seat_id=se.id WHERE bs.booking_id=$1', [b.id]),
         pool.query('SELECT sn.*, bs.quantity FROM booking_snacks bs JOIN snacks sn ON bs.snack_id=sn.id WHERE bs.booking_id=$1', [b.id]),
       ]);
-      return { ...b, seats, snacks };
+      return { ...parseBooking(b), seats, snacks: snacks.map(parseSnackInBooking) };
     }));
 
     res.json(result);
@@ -139,7 +146,7 @@ router.get('/ref/:reference', authenticate, async (req, res) => {
       pool.query('SELECT se.* FROM booking_seats bs JOIN seats se ON bs.seat_id=se.id WHERE bs.booking_id=$1', [booking.id]),
       pool.query('SELECT sn.*, bs.quantity FROM booking_snacks bs JOIN snacks sn ON bs.snack_id=sn.id WHERE bs.booking_id=$1', [booking.id]),
     ]);
-    res.json({ ...booking, seats, snacks });
+    res.json({ ...parseBooking(booking), seats, snacks: snacks.map(parseSnackInBooking) });
   } catch (err) {
     console.error('Get booking by ref error:', err.message);
     res.status(500).json({ message: 'Server error' });
@@ -168,7 +175,7 @@ router.get('/admin/all', authenticate, requireAdmin, async (req, res) => {
         pool.query('SELECT se.* FROM booking_seats bs JOIN seats se ON bs.seat_id=se.id WHERE bs.booking_id=$1', [b.id]),
         pool.query('SELECT sn.*, bs.quantity FROM booking_snacks bs JOIN snacks sn ON bs.snack_id=sn.id WHERE bs.booking_id=$1', [b.id]),
       ]);
-      return { ...b, seats, snacks };
+      return { ...parseBooking(b), seats, snacks: snacks.map(parseSnackInBooking) };
     }));
 
     res.json(result);
