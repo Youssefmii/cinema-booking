@@ -14,6 +14,18 @@ export function BookingProvider({ children }) {
     const exists = prev.selectedSeats.find(s => s.id === seat.id);
     return { ...prev, selectedSeats: exists ? prev.selectedSeats.filter(s => s.id !== seat.id) : [...prev.selectedSeats, seat] };
   });
+
+  // For couple seats — always select/deselect the whole pair together
+  const toggleCouplePair = (pairSeats) => setBookingData(prev => {
+    const anySelected = pairSeats.some(s => prev.selectedSeats.find(sel => sel.id === s.id));
+    if (anySelected) {
+      // Deselect both
+      return { ...prev, selectedSeats: prev.selectedSeats.filter(s => !pairSeats.find(p => p.id === s.id)) };
+    } else {
+      // Select both
+      return { ...prev, selectedSeats: [...prev.selectedSeats, ...pairSeats] };
+    }
+  });
   const setSnacks = (snacks) => setBookingData(prev => ({ ...prev, selectedSnacks: snacks }));
   const clearBooking = () => setBookingData({ showtime: null, selectedSeats: [], selectedSnacks: [] });
 
@@ -32,7 +44,7 @@ export function BookingProvider({ children }) {
   };
 
   return (
-    <BookingContext.Provider value={{ bookingData, setShowtime, toggleSeat, setSnacks, clearBooking, seatPrice, total }}>
+    <BookingContext.Provider value={{ bookingData, setShowtime, toggleSeat, toggleCouplePair, setSnacks, clearBooking, seatPrice, total }}>
       {children}
     </BookingContext.Provider>
   );

@@ -7,7 +7,7 @@ const SEAT_COLORS = {
 };
 
 export default function SeatGrid({ seats, readOnly = false }) {
-  const { bookingData, toggleSeat, seatPrice } = useBooking();
+  const { bookingData, toggleSeat, toggleCouplePair, seatPrice } = useBooking();
 
   // Group seats by row
   const rows = {};
@@ -28,7 +28,7 @@ export default function SeatGrid({ seats, readOnly = false }) {
       <div className="flex flex-wrap justify-center gap-4 mb-6 text-xs">
         <span className="flex items-center gap-1"><span className="w-4 h-4 rounded border bg-slate-100 border-slate-300 inline-block"></span> Standard ${bookingData.showtime?.price_standard}</span>
         <span className="flex items-center gap-1"><span className="w-4 h-4 rounded border bg-amber-50 border-amber-300 inline-block"></span> VIP ${bookingData.showtime?.price_vip}</span>
-        <span className="flex items-center gap-1"><span className="w-4 h-4 rounded border bg-pink-50 border-pink-300 inline-block"></span> Couple ${bookingData.showtime?.price_couple}</span>
+        <span className="flex items-center gap-1"><span className="w-4 h-4 rounded border bg-pink-50 border-pink-300 inline-block"></span> Couple ${bookingData.showtime?.price_couple} <span className="text-pink-400">(pair)</span></span>
         <span className="flex items-center gap-1"><span className="w-4 h-4 rounded border bg-blue-600 border-blue-600 inline-block"></span> Selected</span>
         <span className="flex items-center gap-1"><span className="w-4 h-4 rounded border bg-slate-200 border-slate-200 inline-block"></span> Booked</span>
       </div>
@@ -36,30 +36,51 @@ export default function SeatGrid({ seats, readOnly = false }) {
       {/* Grid */}
       <div className="overflow-x-auto flex justify-center">
         <div className="min-w-max">
-          {Object.entries(rows).map(([rowLabel, rowSeats]) => (
-            <div key={rowLabel} className="flex items-center gap-1 mb-1">
-              <span className="w-6 text-xs text-slate-400 font-medium text-right mr-1">{rowLabel}</span>
-              {rowSeats.map(seat => {
-                const isSelected = !readOnly && bookingData.selectedSeats.some(s => s.id === seat.id);
-                const isBooked = seat.is_booked;
-                const colors = SEAT_COLORS[seat.seat_type] || SEAT_COLORS.standard;
-                const cls = isBooked ? colors.booked : isSelected ? colors.selected : colors.available;
+          {Object.entries(rows).map(([rowLabel, rowSeats]) => {
+            // Find couple pair for this row (all seats with seat_type === 'couple')
+            const couplePair = rowSeats.filter(s => s.seat_type === 'couple');
+            const isPairFullyBooked = couplePair.length > 0 && couplePair.every(s => s.is_booked);
 
-                return (
-                  <button
-                    key={seat.id}
-                    disabled={isBooked || readOnly}
-                    onClick={() => !readOnly && !isBooked && toggleSeat(seat)}
-                    title={`${rowLabel}${seat.seat_number} — ${seat.seat_type} — $${seatPrice(seat)}`}
-                    className={`seat-btn w-8 h-8 text-xs font-medium rounded border ${cls} flex items-center justify-center`}
-                  >
-                    {seat.seat_number}
-                  </button>
-                );
-              })}
-              <span className="w-6 text-xs text-slate-400 font-medium ml-1">{rowLabel}</span>
-            </div>
-          ))}
+            return (
+              <div key={rowLabel} className="flex items-center gap-1 mb-1">
+                <span className="w-6 text-xs text-slate-400 font-medium text-right mr-1">{rowLabel}</span>
+                {rowSeats.map(seat => {
+                  const isSelected = !readOnly && bookingData.selectedSeats.some(s => s.id === seat.id);
+                  const isBooked = seat.is_booked;
+                  // For couple seats: disabled if either seat in the pair is booked
+                  const isCoupleDisabled = seat.seat_type === 'couple' && (isPairFullyBooked || couplePair.some(s => s.is_booked));
+                  const colors = SEAT_COLORS[seat.seat_type] || SEAT_COLORS.standard;
+                  const cls = (isBooked || isCoupleDisabled) ? colors.booked : isSelected ? colors.selected : colors.available;
+
+                  const handleClick = () => {
+                    if (readOnly || isBooked || isCoupleDisabled) return;
+                    if (seat.seat_type === 'couple') {
+                      toggleCouplePair(couplePair);
+                    } else {
+                      toggleSeat(seat);
+                    }
+                  };
+
+                  return (
+                    <button
+                      key={seat.id}
+                      disabled={isBooked || isCoupleDisabled || readOnly}
+                      onClick={handleClick}
+                      title={
+                        seat.seat_type === 'couple'
+                          ? `${rowLabel}${seat.seat_number} — Couple seat (books pair) — $${seatPrice(seat)} each`
+                          : `${rowLabel}${seat.seat_number} — ${seat.seat_type} — $${seatPrice(seat)}`
+                      }
+                      className={`seat-btn w-8 h-8 text-xs font-medium rounded border ${cls} flex items-center justify-center`}
+                    >
+                      {seat.seat_number}
+                    </button>
+                  );
+                })}
+                <span className="w-6 text-xs text-slate-400 font-medium ml-1">{rowLabel}</span>
+              </div>
+            );
+          })}
           {/* Seat numbers at bottom */}
           <div className="flex items-center gap-1 mt-1 ml-7">
             {Object.values(rows)[0]?.map(s => (
