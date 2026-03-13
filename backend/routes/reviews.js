@@ -49,17 +49,6 @@ router.post('/', authenticate, async (req, res) => {
       return res.json({ message: 'Review updated' });
     }
 
-    // New review — must have attended the movie
-    const { rows: eligible } = await pool.query(`
-      SELECT b.id FROM bookings b
-      JOIN showtimes s ON b.showtime_id = s.id
-      WHERE b.user_id = $1 AND s.movie_id = $2 AND b.status = 'confirmed'
-        AND s.datetime < NOW()
-    `, [req.user.id, movieId]);
-
-    if (!eligible.length)
-      return res.status(403).json({ message: 'You can only review movies you have watched.' });
-
     await pool.query(
       'INSERT INTO reviews (user_id, movie_id, rating, comment) VALUES ($1, $2, $3, $4)',
       [req.user.id, movieId, rating, comment || null]

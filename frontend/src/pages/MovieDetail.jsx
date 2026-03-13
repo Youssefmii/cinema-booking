@@ -80,15 +80,7 @@ export default function MovieDetail() {
     }).finally(() => setLoading(false));
 
     if (user) {
-      api.get('/bookings/my').then(res => {
-        const now = new Date();
-        const watched = res.data.some(b =>
-          b.status === 'confirmed' &&
-          String(b.movie_id) === String(id) &&
-          new Date(b.datetime) < now
-        );
-        setCanReview(watched);
-      }).catch(() => {});
+      setCanReview(true);
     }
   }, [id, user?.id]);
 
