@@ -2,7 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const pool = require('../database');
 const { authenticate, requireAdmin } = require('../middleware/auth');
-const { sendBookingConfirmation, sendCancellationEmail, sendWaitlistNotification, sendSeatRemovalEmail, sendBlacklistEmail, sendBookingModifiedEmail } = require('../utils/email');
+const { sendBookingConfirmation, sendCancellationEmail, sendWaitlistNotification, sendSeatRemovalEmail, sendBlacklistEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -328,96 +328,6 @@ router.post('/admin/book', authenticate, requireAdmin, async (req, res) => {
     res.status(201).json({ reference, total, user_name: user.name });
   } catch (err) {
     console.error('Admin book error:', err.message);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// User: modify seat selection (swap seats before showtime)
-router.patch('/:id/modify-seats', authenticate, async (req, res) => {
-  try {
-    const { new_seat_ids } = req.body;
-    if (!new_seat_ids || !new_seat_ids.length)
-      return res.status(400).json({ message: 'new_seat_ids required' });
-
-    const { rows } = await pool.query(`
-      SELECT b.*, s.datetime, s.price_standard, s.price_vip, s.price_couple,
-             m.title as movie_title, u.name as user_name, u.email as user_email
-      FROM bookings b
-      JOIN showtimes s ON b.showtime_id = s.id
-      JOIN movies m ON s.movie_id = m.id
-      JOIN users u ON b.user_id = u.id
-      WHERE b.id = $1
-    `, [req.params.id]);
-    const booking = rows[0];
-
-    if (!booking) return res.status(404).json({ message: 'Booking not found' });
-    if (booking.user_id !== req.user.id && req.user.role !== 'admin')
-      return res.status(403).json({ message: 'Forbidden' });
-    if (booking.status === 'cancelled')
-      return res.status(400).json({ message: 'Cannot modify a cancelled booking' });
-    if (new Date(booking.datetime) <= new Date())
-      return res.status(400).json({ message: 'Cannot modify seats after showtime has started' });
-
-    const { rows: currentSeats } = await pool.query(
-      'SELECT se.* FROM booking_seats bs JOIN seats se ON bs.seat_id = se.id WHERE bs.booking_id = $1',
-      [booking.id]
-    );
-
-    // Seats booked by OTHER bookings for this showtime
-    const { rows: otherBooked } = await pool.query(`
-      SELECT bs.seat_id FROM booking_seats bs
-      JOIN bookings b ON bs.booking_id = b.id
-      WHERE b.showtime_id = $1 AND b.status != 'cancelled' AND b.id != $2
-    `, [booking.showtime_id, booking.id]);
-    const otherBookedIds = new Set(otherBooked.map(r => r.seat_id));
-
-    const conflict = new_seat_ids.find(id => otherBookedIds.has(id));
-    if (conflict) return res.status(409).json({ message: 'One or more seats already booked' });
-
-    const newSeatRows = await Promise.all(
-      new_seat_ids.map(id => pool.query('SELECT * FROM seats WHERE id = $1', [id]).then(r => r.rows[0]))
-    );
-
-    let newSeatsTotal = 0;
-    newSeatRows.forEach(s => {
-      if (s.seat_type === 'vip') newSeatsTotal += parseFloat(booking.price_vip);
-      else if (s.seat_type === 'couple') newSeatsTotal += parseFloat(booking.price_couple);
-      else newSeatsTotal += parseFloat(booking.price_standard);
-    });
-
-    const { rows: snackRows } = await pool.query(
-      'SELECT sn.price, bs.quantity FROM booking_snacks bs JOIN snacks sn ON bs.snack_id = sn.id WHERE bs.booking_id = $1',
-      [booking.id]
-    );
-    const snacksTotal = snackRows.reduce((sum, s) => sum + parseFloat(s.price) * s.quantity, 0);
-    const newTotal = newSeatsTotal + snacksTotal;
-
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      await client.query('DELETE FROM booking_seats WHERE booking_id = $1', [booking.id]);
-      for (const sid of new_seat_ids) {
-        await client.query('INSERT INTO booking_seats (booking_id, seat_id) VALUES ($1, $2)', [booking.id, sid]);
-      }
-      await client.query('UPDATE bookings SET total_price = $1 WHERE id = $2', [newTotal, booking.id]);
-      await client.query('COMMIT');
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
-
-    sendBookingModifiedEmail({
-      to: booking.user_email, name: booking.user_name,
-      reference: booking.reference_number, movie: booking.movie_title,
-      showtime: booking.datetime,
-      oldSeats: currentSeats, newSeats: newSeatRows, newTotal,
-    }).catch(err => console.error('Modification email error:', err.message));
-
-    res.json({ message: 'Seats updated', newTotal, newSeats: newSeatRows });
-  } catch (err) {
-    console.error('Modify seats error:', err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });

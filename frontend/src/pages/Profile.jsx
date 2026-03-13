@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { format } from 'date-fns';
-import { Ticket, Film, Clock, MapPin, ChevronDown, ChevronUp, XCircle, BadgeCheck, ShieldBan, RefreshCw } from 'lucide-react';
+import { Ticket, Film, Clock, MapPin, ChevronDown, ChevronUp, XCircle, BadgeCheck, ShieldBan } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function BookingCard({ booking, onCancel }) {
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -82,14 +80,6 @@ function BookingCard({ booking, onCancel }) {
           {/* Actions */}
           {booking.status === 'confirmed' && new Date(booking.datetime) > new Date() && (
             <div className="pt-1 flex flex-wrap items-center gap-4">
-              {/* Modify seats */}
-              <button
-                onClick={() => navigate(`/booking/${booking.id}/modify`)}
-                className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                <RefreshCw size={15}/> Modify Seats
-              </button>
-
               {/* Cancel */}
               {!showConfirm ? (
                 <button

@@ -16,7 +16,6 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import ModifySeats from './pages/ModifySeats';
 
 import AdminLayout from './pages/admin/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -62,7 +61,6 @@ export default function App() {
             <Route path="/booking/:showtimeId/summary" element={<ProtectedRoute><BookingSummary /></ProtectedRoute>} />
             <Route path="/booking/confirmation/:reference" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/booking/:bookingId/modify" element={<ProtectedRoute><ModifySeats /></ProtectedRoute>} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
