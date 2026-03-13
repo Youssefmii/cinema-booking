@@ -46,6 +46,7 @@ export default function App() {
 
           <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
           <Navbar />
+          <div className="min-h-screen bg-slate-50">
           <Routes>
             {/* Public */}
             <Route path="/" element={<Home />} />
@@ -75,6 +76,7 @@ export default function App() {
               <Route path="users" element={<AdminUsers />} />
             </Route>
           </Routes>
+          </div>
 
         </BookingProvider>
       </AuthProvider>
