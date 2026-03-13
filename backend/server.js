@@ -26,9 +26,16 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 // Serve React frontend build in production
 const frontendBuild = path.join(__dirname, '../frontend/dist');
 if (fs.existsSync(frontendBuild)) {
-  app.use(express.static(frontendBuild));
+  // Hashed assets (JS/CSS) — cache forever
+  app.use('/assets', express.static(path.join(frontendBuild, 'assets'), {
+    maxAge: '1y',
+    immutable: true,
+  }));
+  // Everything else (index.html, vite.svg, etc.) — never cache
+  app.use(express.static(frontendBuild, { maxAge: 0 }));
   app.get('*', (req, res) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ message: 'Not found' });
+    res.setHeader('Cache-Control', 'no-store');
     res.sendFile(path.join(frontendBuild, 'index.html'));
   });
 }
