@@ -181,8 +181,8 @@ export default function AdminUsers() {
 
       {/* Add User Modal */}
       {modal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/10 rounded-2xl w-full max-w-md shadow-xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-md shadow-xl border border-white/15">
             <div className="flex items-center justify-between p-5 border-b border-white/15">
               <h2 className="font-bold text-white flex items-center gap-2"><UserPlus size={18}/> Add New User</h2>
               <button onClick={() => { setModal(false); setForm(emptyForm); }}><X size={22} className="text-slate-400"/></button>
@@ -192,25 +192,25 @@ export default function AdminUsers() {
                 <label className="block text-sm font-medium text-slate-200 mb-1">Full Name</label>
                 <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})}
                   placeholder="John Smith"
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Email</label>
                 <input required type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
                   placeholder="john@example.com"
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Password</label>
                 <input required type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
                   placeholder="Minimum 6 characters"
                   minLength={6}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Role</label>
                 <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
                 </select>

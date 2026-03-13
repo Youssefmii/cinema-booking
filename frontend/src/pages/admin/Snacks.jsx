@@ -84,8 +84,8 @@ export default function AdminSnacks() {
       {snacks.length === 0 && <div className="text-center py-12 text-slate-400 bg-white/10 rounded-xl border border-white/15">No snacks yet</div>}
 
       {modal !== null && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/10 rounded-2xl w-full max-w-sm shadow-xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-sm shadow-xl border border-white/15">
             <div className="flex items-center justify-between p-5 border-b border-white/15">
               <h2 className="font-bold text-white">{modal === 'add' ? 'Add Snack' : 'Edit Snack'}</h2>
               <button onClick={close}><X size={22} className="text-slate-400"/></button>
@@ -94,18 +94,18 @@ export default function AdminSnacks() {
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Name</label>
                 <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="e.g. Large Popcorn"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="e.g. Large Popcorn"/>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-1">Price ($)</label>
                   <input type="number" min="0" step="0.5" required value={form.price} onChange={e => setForm({...form, price: e.target.value})}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                    className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-1">Category</label>
                   <select value={form.category} onChange={e => setForm({...form, category: e.target.value})}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                     {CATEGORIES.map(c => <option key={c} value={c} className="capitalize">{c}</option>)}
                   </select>
                 </div>

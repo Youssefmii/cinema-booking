@@ -106,8 +106,8 @@ export default function AdminShowtimes() {
       </div>
 
       {modal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/10 rounded-2xl w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-md shadow-xl border border-white/15 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-white/15">
               <h2 className="font-bold text-white">Add Showtime</h2>
               <button onClick={() => { setModal(false); setForm(emptyForm); }}><X size={22} className="text-slate-400"/></button>
@@ -116,7 +116,7 @@ export default function AdminShowtimes() {
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Movie</label>
                 <select required value={form.movie_id} onChange={e => setForm({...form, movie_id: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                   <option value="">Select movie</option>
                   {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
                 </select>
@@ -124,7 +124,7 @@ export default function AdminShowtimes() {
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Hall</label>
                 <select required value={form.hall_id} onChange={e => setForm({...form, hall_id: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                   <option value="">Select hall</option>
                   {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
                 </select>
@@ -137,7 +137,7 @@ export default function AdminShowtimes() {
                   min={now()}
                   value={form.datetime}
                   onChange={e => setForm({...form, datetime: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
 
               {/* Recurring toggle */}
@@ -174,7 +174,7 @@ export default function AdminShowtimes() {
                   <div key={k}>
                     <label className="block text-xs font-medium text-slate-200 mb-1">{l}</label>
                     <input type="number" min="0" step="0.5" required value={form[k]} onChange={e => setForm({...form, [k]: e.target.value})}
-                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
                   </div>
                 ))}
               </div>

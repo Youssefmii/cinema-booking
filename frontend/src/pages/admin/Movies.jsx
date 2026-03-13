@@ -90,8 +90,8 @@ export default function AdminMovies() {
 
       {/* Modal */}
       {modal !== null && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/10 rounded-2xl w-full max-w-lg shadow-xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-lg shadow-xl border border-white/15">
             <div className="flex items-center justify-between p-5 border-b border-white/15">
               <h2 className="font-bold text-white text-lg">{modal === 'add' ? 'Add Movie' : 'Edit Movie'}</h2>
               <button onClick={close} className="text-slate-400 hover:text-slate-400"><X size={22}/></button>
@@ -106,13 +106,13 @@ export default function AdminMovies() {
                 <div key={f.key}>
                   <label className="block text-sm font-medium text-slate-200 mb-1">{f.label}</label>
                   <input type={f.type} required={f.required} value={form[f.key]} onChange={e => setForm({...form, [f.key]: e.target.value})}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                    className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
                 </div>
               ))}
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Description</label>
                 <textarea rows={3} value={form.description} onChange={e => setForm({...form, description: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"/>
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={close} className="flex-1 py-2.5 border border-white/15 rounded-xl text-slate-400 font-medium hover:bg-white/10">Cancel</button>

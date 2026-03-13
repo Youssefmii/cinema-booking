@@ -78,8 +78,8 @@ export default function AdminHalls() {
       </div>
 
       {modal !== null && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/10 rounded-2xl w-full max-w-sm shadow-xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-sm shadow-xl border border-white/15">
             <div className="flex items-center justify-between p-5 border-b border-white/15">
               <h2 className="font-bold text-white">{modal === 'add' ? 'Add Hall' : 'Edit Hall'}</h2>
               <button onClick={close}><X size={22} className="text-slate-400"/></button>
@@ -88,21 +88,21 @@ export default function AdminHalls() {
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Hall Name</label>
                 <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="e.g. Hall 1"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="e.g. Hall 1"/>
               </div>
               {modal === 'add' && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-slate-200 mb-1">Number of Rows</label>
                     <input type="number" min="1" max="26" required value={form.rows} onChange={e => setForm({...form, rows: e.target.value})}
-                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-200 mb-1">Seats per Row</label>
                     <input type="number" min="1" max="30" required value={form.seats_per_row} onChange={e => setForm({...form, seats_per_row: e.target.value})}
-                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
                   </div>
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-300">
                     Row A will be VIP. Last 2 seats of each row will be Couple. All other seats are Standard.
                   </div>
                 </>
