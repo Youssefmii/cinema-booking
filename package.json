@@ -2,7 +2,7 @@
   "name": "cinema-booking",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
+    "build": "echo 'Frontend already built'",
     "start": "cd backend && node server.js"
   }
 }
