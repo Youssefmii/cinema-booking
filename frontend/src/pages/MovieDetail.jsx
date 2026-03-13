@@ -130,7 +130,7 @@ export default function MovieDetail() {
   };
 
   if (loading) return <LoadingSpinner />;
-  if (!movie) return <div className="text-center py-20 text-slate-500">Movie not found</div>;
+  if (!movie) return <div className="text-center py-20 text-slate-300">Movie not found</div>;
 
   const fallback = `https://placehold.co/300x450/1e3a5f/white?text=${encodeURIComponent(movie.title)}`;
 
@@ -143,16 +143,16 @@ export default function MovieDetail() {
   }, {});
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 bg-white rounded-xl shadow-sm my-4">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       {showBlacklistModal && <BlacklistModal onClose={() => setShowBlacklistModal(false)} />}
 
       {/* Blacklist banner */}
       {user && isBlacklisted && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3 items-start">
-          <ShieldBan size={20} className="text-red-600 flex-shrink-0 mt-0.5"/>
+        <div className="mb-6 bg-red-900/60 border border-red-500/50 rounded-xl p-4 flex gap-3 items-start">
+          <ShieldBan size={20} className="text-red-400 flex-shrink-0 mt-0.5"/>
           <div>
-            <p className="font-semibold text-red-700 text-sm">Account Restricted — Booking Disabled</p>
-            <p className="text-red-600 text-sm mt-0.5">
+            <p className="font-semibold text-red-300 text-sm">Account Restricted — Booking Disabled</p>
+            <p className="text-red-400 text-sm mt-0.5">
               You cannot book tickets directly. Please visit the cinema or contact staff to book on your behalf.
             </p>
           </div>
@@ -170,63 +170,63 @@ export default function MovieDetail() {
           />
         </div>
         <div className="flex-1">
-          <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">{movie.genre}</span>
-          <h1 className="text-3xl font-bold text-slate-800 mb-3">{movie.title}</h1>
-          <div className="flex flex-wrap gap-4 text-slate-500 text-sm mb-4">
+          <span className="inline-block bg-blue-500/20 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full mb-3 border border-blue-500/30">{movie.genre}</span>
+          <h1 className="text-3xl font-bold text-white mb-3">{movie.title}</h1>
+          <div className="flex flex-wrap gap-4 text-slate-400 text-sm mb-4">
             <span className="flex items-center gap-1"><Clock size={16} /> {movie.duration} minutes</span>
             <span className="flex items-center gap-1"><Tag size={16} /> {movie.genre}</span>
           </div>
-          <p className="text-slate-600 leading-relaxed">{movie.description}</p>
+          <p className="text-slate-300 leading-relaxed">{movie.description}</p>
         </div>
       </div>
 
       {/* Rating summary */}
       {avgRating && (
-        <div className="flex items-center gap-3 mb-8 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 w-fit">
+        <div className="flex items-center gap-3 mb-8 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 w-fit">
           <Stars rating={avgRating} size={18}/>
-          <span className="font-bold text-amber-700 text-lg">{avgRating}</span>
-          <span className="text-slate-500 text-sm">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+          <span className="font-bold text-amber-400 text-lg">{avgRating}</span>
+          <span className="text-slate-400 text-sm">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
         </div>
       )}
 
       {/* Showtimes */}
       <div>
-        <h2 className="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
-          <Calendar size={20} className="text-blue-600" /> Available Showtimes
+        <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
+          <Calendar size={20} className="text-blue-400" /> Available Showtimes
         </h2>
 
         {Object.keys(grouped).length === 0 ? (
-          <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-xl">No showtimes available</div>
+          <div className="text-center py-12 text-slate-400 bg-white/5 rounded-xl">No showtimes available</div>
         ) : (
           <div className="space-y-5">
             {Object.entries(grouped).map(([date, sts]) => (
               <div key={date}>
-                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">{date}</h3>
+                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">{date}</h3>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {sts.map(st => (
                     <button
                       key={st.id}
                       onClick={() => handleSelect(st)}
-                      className={`flex items-center justify-between bg-white border rounded-xl p-4 transition-all text-left group ${
+                      className={`flex items-center justify-between bg-white/10 border rounded-xl p-4 transition-all text-left group ${
                         isBlacklisted
-                          ? 'border-slate-200 opacity-60 cursor-not-allowed'
-                          : 'border-slate-200 hover:border-blue-400 hover:shadow-md'
+                          ? 'border-white/10 opacity-60 cursor-not-allowed'
+                          : 'border-white/15 hover:border-blue-400 hover:bg-white/15 hover:shadow-md'
                       }`}
                     >
                       <div>
-                        <div className="font-bold text-slate-800 text-lg">{format(new Date(st.datetime), 'h:mm a')}</div>
-                        <div className="flex items-center gap-1 text-slate-500 text-sm mt-0.5">
+                        <div className="font-bold text-white text-lg">{format(new Date(st.datetime), 'h:mm a')}</div>
+                        <div className="flex items-center gap-1 text-slate-400 text-sm mt-0.5">
                           <MapPin size={13} /> {st.hall_name}
                         </div>
-                        <div className="flex gap-3 mt-2 text-xs text-slate-500">
-                          <span>Standard <strong className="text-slate-700">${st.price_standard}</strong></span>
-                          <span>VIP <strong className="text-amber-600">${st.price_vip}</strong></span>
-                          <span>Couple <strong className="text-pink-600">${st.price_couple}</strong></span>
+                        <div className="flex gap-3 mt-2 text-xs text-slate-400">
+                          <span>Standard <strong className="text-slate-200">${st.price_standard}</strong></span>
+                          <span>VIP <strong className="text-amber-400">${st.price_vip}</strong></span>
+                          <span>Couple <strong className="text-pink-400">${st.price_couple}</strong></span>
                         </div>
                       </div>
                       {isBlacklisted
                         ? <ShieldBan size={18} className="text-red-400 flex-shrink-0"/>
-                        : <ChevronRight size={20} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+                        : <ChevronRight size={20} className="text-slate-400 group-hover:text-blue-400 transition-colors" />
                       }
                     </button>
                   ))}
@@ -239,14 +239,14 @@ export default function MovieDetail() {
 
       {/* Reviews */}
       <div className="mt-10">
-        <h2 className="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
-          <MessageSquare size={20} className="text-blue-600" /> Reviews
+        <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
+          <MessageSquare size={20} className="text-blue-400" /> Reviews
         </h2>
 
         {/* Write / Edit review form */}
         {user && ((canReview && !userReview) || editingReview) && (
-          <form onSubmit={handleReviewSubmit} className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 space-y-3">
-            <p className="font-semibold text-slate-700 text-sm">
+          <form onSubmit={handleReviewSubmit} className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 mb-6 space-y-3">
+            <p className="font-semibold text-slate-200 text-sm">
               {editingReview ? 'Edit your review' : 'Share your experience'}
             </p>
             <StarRating value={reviewForm.rating} onChange={r => setReviewForm(f => ({ ...f, rating: r }))} />
@@ -255,7 +255,7 @@ export default function MovieDetail() {
               onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
               placeholder="Write your review (optional)..."
               rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-slate-700 text-sm resize-none"
+              className="w-full px-3 py-2 rounded-lg border border-white/20 bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-slate-200 placeholder-slate-500 text-sm resize-none"
             />
             <div className="flex gap-2">
               <button
@@ -268,7 +268,7 @@ export default function MovieDetail() {
                 <button
                   type="button"
                   onClick={() => { setEditingReview(false); setReviewForm({ rating: userReview.rating, comment: userReview.comment || '' }); }}
-                  className="px-4 py-2 rounded-lg text-sm text-slate-500 hover:text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-slate-200 border border-white/20 hover:bg-white/10 transition-colors"
                 >
                   Cancel
                 </button>
@@ -278,31 +278,31 @@ export default function MovieDetail() {
         )}
 
         {reviews.length === 0 ? (
-          <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl">
+          <div className="text-center py-10 text-slate-400 bg-white/5 rounded-xl">
             <Star size={32} className="mx-auto mb-2 opacity-30"/>
             <p>No reviews yet. Be the first to share your experience!</p>
           </div>
         ) : (
           <div className="space-y-4">
             {reviews.map(r => (
-              <div key={r.id} className={`bg-white border rounded-xl p-4 ${r.user_id === user?.id ? 'border-blue-200 bg-blue-50/30' : 'border-slate-200'}`}>
+              <div key={r.id} className={`bg-white/10 border rounded-xl p-4 ${r.user_id === user?.id ? 'border-blue-500/40' : 'border-white/15'}`}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center font-bold text-sm">
                       {r.user_name?.[0]?.toUpperCase()}
                     </div>
-                    <span className="font-semibold text-slate-700 text-sm">{r.user_name}</span>
+                    <span className="font-semibold text-slate-200 text-sm">{r.user_name}</span>
                     {r.user_id === user?.id && (
-                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">You</span>
+                      <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/30">You</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Stars rating={r.rating} size={14}/>
-                    <span className="text-xs text-slate-400">{new Date(r.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs text-slate-500">{new Date(r.created_at).toLocaleDateString()}</span>
                     {r.user_id === user?.id && !editingReview && (
                       <button
                         onClick={() => { setEditingReview(true); setReviewForm({ rating: r.rating, comment: r.comment || '' }); }}
-                        className="text-xs text-blue-600 hover:text-blue-800 font-medium ml-1"
+                        className="text-xs text-blue-400 hover:text-blue-300 font-medium ml-1"
                       >
                         Edit
                       </button>
@@ -310,7 +310,7 @@ export default function MovieDetail() {
                     {isAdmin && (
                       <button
                         onClick={() => handleDeleteReview(r.id)}
-                        className="ml-1 text-slate-300 hover:text-red-500 transition-colors"
+                        className="ml-1 text-slate-500 hover:text-red-400 transition-colors"
                         title="Delete review"
                       >
                         <Trash2 size={13}/>
@@ -318,7 +318,7 @@ export default function MovieDetail() {
                     )}
                   </div>
                 </div>
-                {r.comment && <p className="text-slate-600 text-sm leading-relaxed mt-1">{r.comment}</p>}
+                {r.comment && <p className="text-slate-300 text-sm leading-relaxed mt-1">{r.comment}</p>}
               </div>
             ))}
           </div>

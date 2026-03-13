@@ -46,7 +46,7 @@ export default function App() {
 
           <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
           <Navbar />
-          <div className="min-h-screen bg-slate-50">
+          <div className="min-h-screen">
           <Routes>
             {/* Public */}
             <Route path="/" element={<Home />} />
