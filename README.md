@@ -18,12 +18,6 @@ npm run dev
 
 Open **http://localhost:5173** in your browser.
 
-## Demo Accounts
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@cinema.com | admin123 |
-| User | john@example.com | user123 |
-
 ## Features
 - Browse movies with poster, genre, duration
 - Select showtimes by date
