@@ -25,9 +25,9 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Hero */}
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl font-bold text-slate-800 mb-3">Now Showing</h1>
-        <p className="text-slate-500 text-lg">Choose your movie, pick your seat, enjoy the show</p>
+      <div className="mb-10 -mx-4 -mt-8 px-4 pt-16 pb-12 text-center bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700 rounded-b-3xl shadow-lg">
+        <h1 className="text-4xl font-bold text-white mb-3">Now Showing</h1>
+        <p className="text-slate-300 text-lg">Choose your movie, pick your seat, enjoy the show</p>
       </div>
 
       {/* Filters */}

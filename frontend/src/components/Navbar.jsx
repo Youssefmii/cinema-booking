@@ -11,8 +11,8 @@ export default function Navbar() {
   const handleLogout = () => { logout(); navigate('/'); setOpen(false); };
 
   return (
-    <nav className="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+    <nav className="bg-slate-900 border-b border-white/10 sticky top-0 z-50 shadow-lg">
+      <div className="w-full px-4 flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tight text-white hover:text-blue-300 transition-colors">
           <Film size={24} />
           <span>cinemabooking</span>
@@ -57,7 +57,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-white/10 bg-black/40 backdrop-blur-md px-4 pb-4 flex flex-col gap-3">
+        <div className="md:hidden border-t border-white/10 bg-slate-900 px-4 pb-4 flex flex-col gap-3">
           <Link to="/" className="text-white/90 font-medium py-2" onClick={() => setOpen(false)}>Movies</Link>
           {user ? (
             <>

@@ -5,7 +5,7 @@ import api from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useBooking } from '../context/BookingContext';
 import { useAuth } from '../context/AuthContext';
-import { Clock, Tag, Calendar, MapPin, ChevronRight, ShieldBan, X, Star, MessageSquare } from 'lucide-react';
+import { Clock, Tag, Calendar, MapPin, ChevronRight, ShieldBan, X, Star, MessageSquare, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import StarRating, { Stars } from '../components/StarRating';
 
@@ -47,7 +47,7 @@ function BlacklistModal({ onClose }) {
 export default function MovieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isBlacklisted } = useAuth();
+  const { user, isBlacklisted, isAdmin } = useAuth();
   const { setShowtime } = useBooking();
   const [movie, setMovie] = useState(null);
   const [showtimes, setShowtimes] = useState([]);
@@ -93,6 +93,17 @@ export default function MovieDetail() {
   }, [reviews, user?.id]);
 
   const userReview = reviews.find(r => r.user_id === user?.id);
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!confirm('Delete this review?')) return;
+    try {
+      await api.delete(`/movies/${id}/reviews/${reviewId}`);
+      toast.success('Review deleted');
+      await refreshReviews();
+    } catch {
+      toast.error('Could not delete review');
+    }
+  };
 
   const handleReviewSubmit = async e => {
     e.preventDefault();
@@ -294,6 +305,15 @@ export default function MovieDetail() {
                         className="text-xs text-blue-600 hover:text-blue-800 font-medium ml-1"
                       >
                         Edit
+                      </button>
+                    )}
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteReview(r.id)}
+                        className="ml-1 text-slate-300 hover:text-red-500 transition-colors"
+                        title="Delete review"
+                      >
+                        <Trash2 size={13}/>
                       </button>
                     )}
                   </div>

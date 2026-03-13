@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-import { Search, ShieldBan, ShieldCheck, X } from 'lucide-react';
+import { Search, ShieldBan, ShieldCheck, X, UserPlus, Trash2, Ticket } from 'lucide-react';
+
+const emptyForm = { name: '', email: '', password: '', role: 'user' };
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [filterBlacklisted, setFilterBlacklisted] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
 
-  const load = () => {
-    api.get('/users').then(r => setUsers(r.data));
-  };
-
+  const load = () => api.get('/users').then(r => setUsers(r.data));
   useEffect(() => { load(); }, []);
 
   const toggleBlacklist = async (userId, isCurrentlyBlacklisted) => {
@@ -25,6 +29,31 @@ export default function AdminUsers() {
     } catch (err) {
       toast.error(err.response?.data?.message || 'Action failed');
     }
+  };
+
+  const deleteUser = async (userId, userName) => {
+    if (!confirm(`Delete user "${userName}"? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/users/${userId}`);
+      toast.success('User deleted');
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not delete user');
+    }
+  };
+
+  const createUser = async e => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await api.post('/users', form);
+      toast.success(`User "${res.data.name}" created`);
+      setModal(false);
+      setForm(emptyForm);
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not create user');
+    } finally { setSaving(false); }
   };
 
   const filtered = users.filter(u => {
@@ -42,11 +71,19 @@ export default function AdminUsers() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Users</h1>
-        {blacklistedCount > 0 && (
-          <span className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-full">
-            <ShieldBan size={14}/> {blacklistedCount} blacklisted
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {blacklistedCount > 0 && (
+            <span className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-full">
+              <ShieldBan size={14}/> {blacklistedCount} blacklisted
+            </span>
+          )}
+          <button
+            onClick={() => setModal(true)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-700 text-sm"
+          >
+            <UserPlus size={16}/> Add User
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6">
@@ -68,10 +105,7 @@ export default function AdminUsers() {
           <ShieldBan size={15}/> Blacklisted only
         </button>
         {(search || filterBlacklisted) && (
-          <button
-            onClick={() => { setSearch(''); setFilterBlacklisted(false); }}
-            className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-700"
-          >
+          <button onClick={() => { setSearch(''); setFilterBlacklisted(false); }} className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-700">
             <X size={16}/> Clear
           </button>
         )}
@@ -111,19 +145,31 @@ export default function AdminUsers() {
                 </td>
                 <td className="px-4 py-3">
                   {u.role !== 'admin' && (
-                    <button
-                      onClick={() => toggleBlacklist(u.id, !!u.is_blacklisted)}
-                      className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-                        u.is_blacklisted
-                          ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                          : 'bg-red-50 text-red-700 hover:bg-red-100'
-                      }`}
-                    >
-                      {u.is_blacklisted
-                        ? <><ShieldCheck size={13}/> Remove from Blacklist</>
-                        : <><ShieldBan size={13}/> Blacklist</>
-                      }
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => navigate('/admin/book-for-user', { state: { preselectedUser: u } })}
+                        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                        title="Book a ticket for this user"
+                      >
+                        <Ticket size={12}/> Book
+                      </button>
+                      <button
+                        onClick={() => toggleBlacklist(u.id, !!u.is_blacklisted)}
+                        className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg transition-colors ${
+                          u.is_blacklisted
+                            ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                            : 'bg-orange-50 text-orange-700 hover:bg-orange-100'
+                        }`}
+                      >
+                        {u.is_blacklisted ? <><ShieldCheck size={12}/> Unblock</> : <><ShieldBan size={12}/> Block</>}
+                      </button>
+                      <button
+                        onClick={() => deleteUser(u.id, u.name)}
+                        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                      >
+                        <Trash2 size={12}/> Delete
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>
@@ -132,6 +178,57 @@ export default function AdminUsers() {
         </table>
         {filtered.length === 0 && <div className="text-center py-10 text-slate-400">No users found</div>}
       </div>
+
+      {/* Add User Modal */}
+      {modal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between p-5 border-b border-slate-200">
+              <h2 className="font-bold text-slate-800 flex items-center gap-2"><UserPlus size={18}/> Add New User</h2>
+              <button onClick={() => { setModal(false); setForm(emptyForm); }}><X size={22} className="text-slate-400"/></button>
+            </div>
+            <form onSubmit={createUser} className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})}
+                  placeholder="John Smith"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <input required type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
+                  placeholder="john@example.com"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <input required type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
+                  placeholder="Minimum 6 characters"
+                  minLength={6}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => { setModal(false); setForm(emptyForm); }}
+                  className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50">
+                  Cancel
+                </button>
+                <button type="submit" disabled={saving}
+                  className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-70">
+                  {saving ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

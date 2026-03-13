@@ -15,6 +15,7 @@ function BookingRow({ booking, onCancel, onRemoveSeat }) {
         <td className="px-4 py-3 text-slate-600">{booking.user_name}</td>
         <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{format(new Date(booking.datetime), 'MMM d · h:mm a')}</td>
         <td className="px-4 py-3 text-slate-600">{booking.hall_name}</td>
+        <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{booking.created_at ? format(new Date(booking.created_at), 'MMM d, yyyy') : '—'}</td>
         <td className="px-4 py-3 font-semibold text-blue-600">${booking.total_price.toFixed(2)}</td>
         <td className="px-4 py-3">
           <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{booking.status}</span>
@@ -33,7 +34,7 @@ function BookingRow({ booking, onCancel, onRemoveSeat }) {
       </tr>
       {open && (
         <tr className="bg-slate-50 border-b border-slate-100">
-          <td colSpan={8} className="px-6 py-3 text-sm">
+          <td colSpan={9} className="px-6 py-3 text-sm">
             <div className="flex flex-wrap gap-6">
               <div>
                 <span className="text-slate-400 font-medium">Seats: </span>
@@ -140,7 +141,7 @@ export default function AdminBookings() {
       <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>{['Reference', 'Movie', 'User', 'Showtime', 'Hall', 'Total', 'Status', 'Actions'].map(h => (
+            <tr>{['Reference', 'Movie', 'User', 'Showtime', 'Hall', 'Booked On', 'Total', 'Status', 'Actions'].map(h => (
               <th key={h} className="text-left px-4 py-3 text-slate-500 font-semibold text-xs uppercase whitespace-nowrap">{h}</th>
             ))}</tr>
           </thead>

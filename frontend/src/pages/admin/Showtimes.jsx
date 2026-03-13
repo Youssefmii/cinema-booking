@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
-const emptyForm = { movie_id: '', hall_id: '', datetime: '', price_standard: 12, price_vip: 22, price_couple: 35 };
+const now = () => new Date().toISOString().slice(0, 16);
+const emptyForm = { movie_id: '', hall_id: '', datetime: '', price_standard: 12, price_vip: 22, price_couple: 35, recurring: false, repeat_type: 'daily', repeat_count: 7 };
 
 export default function AdminShowtimes() {
   const [showtimes, setShowtimes] = useState([]);
@@ -22,21 +23,51 @@ export default function AdminShowtimes() {
   }, []);
 
   const save = async e => {
-    e.preventDefault(); setSaving(true);
+    e.preventDefault();
+    setSaving(true);
     try {
-      await api.post('/showtimes', {
-        ...form,
-        movie_id: Number(form.movie_id), hall_id: Number(form.hall_id),
-        price_standard: Number(form.price_standard), price_vip: Number(form.price_vip), price_couple: Number(form.price_couple),
-      });
-      toast.success('Showtime added'); load(); setModal(false); setForm(emptyForm);
-    } catch (err) { toast.error(err.response?.data?.message || 'Error'); }
-    finally { setSaving(false); }
+      const base = {
+        movie_id: Number(form.movie_id),
+        hall_id: Number(form.hall_id),
+        price_standard: Number(form.price_standard),
+        price_vip: Number(form.price_vip),
+        price_couple: Number(form.price_couple),
+      };
+
+      if (form.recurring) {
+        // Build array of datetimes
+        const datetimes = [];
+        const start = new Date(form.datetime);
+        const count = Math.min(Number(form.repeat_count), 60);
+        const stepMs = form.repeat_type === 'weekly' ? 7 * 24 * 3600 * 1000 : 24 * 3600 * 1000;
+        for (let i = 0; i < count; i++) {
+          datetimes.push(new Date(start.getTime() + i * stepMs).toISOString());
+        }
+        // Create each showtime sequentially
+        for (const dt of datetimes) {
+          await api.post('/showtimes', { ...base, datetime: dt });
+        }
+        toast.success(`${datetimes.length} showtimes created`);
+      } else {
+        await api.post('/showtimes', { ...base, datetime: form.datetime });
+        toast.success('Showtime added');
+      }
+
+      load();
+      setModal(false);
+      setForm(emptyForm);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const del = async (id) => {
     if (!confirm('Delete this showtime?')) return;
-    await api.delete(`/showtimes/${id}`); toast.success('Deleted'); load();
+    await api.delete(`/showtimes/${id}`);
+    toast.success('Deleted');
+    load();
   };
 
   return (
@@ -76,10 +107,10 @@ export default function AdminShowtimes() {
 
       {modal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-slate-200">
               <h2 className="font-bold text-slate-800">Add Showtime</h2>
-              <button onClick={() => setModal(false)}><X size={22} className="text-slate-400"/></button>
+              <button onClick={() => { setModal(false); setForm(emptyForm); }}><X size={22} className="text-slate-400"/></button>
             </div>
             <form onSubmit={save} className="p-5 space-y-4">
               <div>
@@ -99,10 +130,45 @@ export default function AdminShowtimes() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Date & Time</label>
-                <input type="datetime-local" required value={form.datetime} onChange={e => setForm({...form, datetime: e.target.value})}
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  {form.recurring ? 'Start Date & Time' : 'Date & Time'}
+                </label>
+                <input type="datetime-local" required
+                  min={now()}
+                  value={form.datetime}
+                  onChange={e => setForm({...form, datetime: e.target.value})}
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
+
+              {/* Recurring toggle */}
+              <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input type="checkbox" checked={form.recurring} onChange={e => setForm({...form, recurring: e.target.checked})}
+                    className="w-4 h-4 accent-blue-600"/>
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
+                    <RefreshCw size={15}/> Recurring showtime
+                  </span>
+                </label>
+                {form.recurring && (
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Repeat every</label>
+                      <select value={form.repeat_type} onChange={e => setForm({...form, repeat_type: e.target.value})}
+                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="daily">Day</option>
+                        <option value="weekly">Week</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Number of times</label>
+                      <input type="number" min="2" max="60" value={form.repeat_count}
+                        onChange={e => setForm({...form, repeat_count: e.target.value})}
+                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-3 gap-3">
                 {[['price_standard','Standard ($)'],['price_vip','VIP ($)'],['price_couple','Couple ($)']].map(([k,l]) => (
                   <div key={k}>
@@ -113,9 +179,9 @@ export default function AdminShowtimes() {
                 ))}
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => setModal(false)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-medium">Cancel</button>
+                <button type="button" onClick={() => { setModal(false); setForm(emptyForm); }} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-medium">Cancel</button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-medium disabled:opacity-70">
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? 'Saving...' : form.recurring ? `Create ${form.repeat_count} Showtimes` : 'Save'}
                 </button>
               </div>
             </form>

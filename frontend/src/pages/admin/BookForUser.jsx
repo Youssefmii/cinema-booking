@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -11,8 +12,11 @@ const SEAT_COLORS = {
 };
 
 export default function BookForUser() {
-  const [email, setEmail]           = useState('');
-  const [resolvedUser, setResolvedUser] = useState(null);
+  const location = useLocation();
+  const preselected = location.state?.preselectedUser || null;
+
+  const [email, setEmail]           = useState(preselected?.email || '');
+  const [resolvedUser, setResolvedUser] = useState(preselected || null);
   const [lookingUp, setLookingUp]   = useState(false);
 
   const [showtimes, setShowtimes]   = useState([]);

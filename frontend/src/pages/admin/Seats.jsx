@@ -120,6 +120,7 @@ export default function AdminSeats() {
       {mode === 'edit' && selectedHall && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800 font-medium">
           Edit mode — click any seat to change its type. Booked seats cannot be changed.
+          <span className="ml-2 text-amber-700">Couple seats are always set/unset in pairs (last 2 seats of each row).</span>
         </div>
       )}
 

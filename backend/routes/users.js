@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../database');
+const bcrypt = require('bcryptjs');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
@@ -41,6 +42,45 @@ router.get('/lookup', authenticate, requireAdmin, async (req, res) => {
     res.json(rows[0]);
   } catch (err) {
     console.error('Lookup user error:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Admin: create a new user
+router.post('/', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { name, email, password, role = 'user' } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ message: 'Name, email and password are required' });
+    if (!['user', 'admin'].includes(role))
+      return res.status(400).json({ message: 'Invalid role' });
+
+    const { rows: existing } = await pool.query('SELECT id FROM users WHERE email = $1', [email.trim().toLowerCase()]);
+    if (existing.length) return res.status(409).json({ message: 'Email already in use' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const customerNumber = 'CUS-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    const { rows } = await pool.query(
+      'INSERT INTO users (name, email, password_hash, role, customer_number) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, customer_number, created_at',
+      [name.trim(), email.trim().toLowerCase(), hashed, role, customerNumber]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error('Create user error:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Admin: delete a user (cannot delete admins)
+router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT id, role FROM users WHERE id = $1', [req.params.id]);
+    if (!rows[0]) return res.status(404).json({ message: 'User not found' });
+    if (rows[0].role === 'admin') return res.status(400).json({ message: 'Cannot delete an admin account' });
+    await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+    res.json({ message: 'User deleted' });
+  } catch (err) {
+    console.error('Delete user error:', err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
