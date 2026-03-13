@@ -4,6 +4,13 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
+const parseSt = s => ({
+  ...s,
+  price_standard: parseFloat(s.price_standard),
+  price_vip: parseFloat(s.price_vip),
+  price_couple: parseFloat(s.price_couple),
+});
+
 router.get('/', async (req, res) => {
   try {
     const { movie_id } = req.query;
@@ -21,7 +28,7 @@ router.get('/', async (req, res) => {
     }
     query += ' ORDER BY s.datetime ASC';
     const { rows } = await pool.query(query, params);
-    res.json(rows);
+    res.json(rows.map(parseSt));
   } catch (err) {
     console.error('Get showtimes error:', err.message);
     res.status(500).json({ message: 'Server error' });
@@ -37,7 +44,7 @@ router.get('/all', authenticate, requireAdmin, async (req, res) => {
       JOIN halls h ON s.hall_id = h.id
       ORDER BY s.datetime ASC
     `);
-    res.json(rows);
+    res.json(rows.map(parseSt));
   } catch (err) {
     console.error('Get all showtimes error:', err.message);
     res.status(500).json({ message: 'Server error' });
@@ -55,7 +62,7 @@ router.get('/:id', async (req, res) => {
       WHERE s.id = $1
     `, [req.params.id]);
     if (!rows[0]) return res.status(404).json({ message: 'Showtime not found' });
-    res.json(rows[0]);
+    res.json(parseSt(rows[0]));
   } catch (err) {
     console.error('Get showtime error:', err.message);
     res.status(500).json({ message: 'Server error' });

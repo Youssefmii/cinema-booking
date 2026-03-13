@@ -4,10 +4,12 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
+const parseSnack = s => ({ ...s, price: parseFloat(s.price) });
+
 router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM snacks WHERE is_available = TRUE ORDER BY category, name');
-    res.json(rows);
+    res.json(rows.map(parseSnack));
   } catch (err) {
     console.error('Get snacks error:', err.message);
     res.status(500).json({ message: 'Server error' });
@@ -17,7 +19,7 @@ router.get('/', async (req, res) => {
 router.get('/all', authenticate, requireAdmin, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM snacks ORDER BY category, name');
-    res.json(rows);
+    res.json(rows.map(parseSnack));
   } catch (err) {
     console.error('Get all snacks error:', err.message);
     res.status(500).json({ message: 'Server error' });
