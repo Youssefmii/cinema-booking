@@ -26,7 +26,7 @@ const sendBookingConfirmation = async ({ to, name, reference, movie, showtime, s
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + new Date(showtime).toLocaleString() + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Seats</td><td style=" + JSON.stringify("padding:10px;") + ">" + seatList + "</td></tr>" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Snacks</td><td style=" + JSON.stringify("padding:10px;") + ">" + snackList + "</td></tr>" +
-    "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; font-size:18px;") + ">Total</td><td style=" + JSON.stringify("padding:10px; font-size:18px; color:#e63946;") + "><strong>$" + total.toFixed(2) + "</strong></td></tr>" +
+    "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; font-size:18px;") + ">Total</td><td style=" + JSON.stringify("padding:10px; font-size:18px; color:#e63946;") + "><strong>$" + parseFloat(total).toFixed(2) + "</strong></td></tr>" +
     "</table>" +
     "<p style=" + JSON.stringify("color:#666; font-size:13px;") + ">Please present your reference number at the cinema entrance.</p>" +
     "</div>" +
@@ -61,7 +61,7 @@ const sendCancellationEmail = async ({ to, name, reference, movie, showtime, sea
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Movie</td><td style=" + JSON.stringify("padding:10px;") + ">" + movie + "</td></tr>" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + new Date(showtime).toLocaleString() + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Seats</td><td style=" + JSON.stringify("padding:10px;") + ">" + seatList + "</td></tr>" +
-    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Total Paid</td><td style=" + JSON.stringify("padding:10px;") + ">$" + total.toFixed(2) + "</td></tr>" +
+    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Total Paid</td><td style=" + JSON.stringify("padding:10px;") + ">$" + parseFloat(total).toFixed(2) + "</td></tr>" +
     "</table>" +
     "<p style=" + JSON.stringify("color:#666; font-size:13px;") + ">" + footerNote + "</p>" +
     "</div>" +
@@ -78,7 +78,7 @@ const sendCancellationEmail = async ({ to, name, reference, movie, showtime, sea
 
 
 const sendWaitlistNotification = async ({ to, name, movie, showtime, showtimeId }) => {
-  const bookingUrl = 'http://localhost:5173/booking/' + showtimeId + '/seats';
+  const bookingUrl = (process.env.FRONTEND_URL || 'https://cinema-booking-flame.vercel.app') + '/booking/' + showtimeId + '/seats';
 
   const html = '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">' +
     '<div style="background: #1d6fa4; color: white; padding: 24px; text-align: center;">' +
@@ -124,7 +124,7 @@ const sendSeatRemovalEmail = async ({ to, name, reference, movie, showtime, remo
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + new Date(showtime).toLocaleString() + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; color:#c0392b;") + ">Removed Seat(s)</td><td style=" + JSON.stringify("padding:10px; color:#c0392b;") + ">" + removedList + "</td></tr>" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Remaining Seat(s)</td><td style=" + JSON.stringify("padding:10px;") + ">" + remainingList + "</td></tr>" +
-    "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; font-size:18px;") + ">New Total</td><td style=" + JSON.stringify("padding:10px; font-size:18px; color:#e63946;") + "><strong>$" + newTotal.toFixed(2) + "</strong></td></tr>" +
+    "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; font-size:18px;") + ">New Total</td><td style=" + JSON.stringify("padding:10px; font-size:18px; color:#e63946;") + "><strong>$" + parseFloat(newTotal).toFixed(2) + "</strong></td></tr>" +
     "</table>" +
     "<p style=" + JSON.stringify("color:#666; font-size:13px;") + ">If you believe this is a mistake, please contact our support team.</p>" +
     "</div>" +
@@ -222,7 +222,7 @@ const sendBookingModifiedEmail = async ({ to, name, reference, movie, showtime, 
     '<tr style="background:#f9f9f9"><td style="padding:10px;font-weight:bold;">Showtime</td><td style="padding:10px;">' + new Date(showtime).toLocaleString() + '</td></tr>' +
     '<tr><td style="padding:10px;font-weight:bold;color:#dc2626;">Old Seats</td><td style="padding:10px;color:#dc2626;text-decoration:line-through;">' + oldList + '</td></tr>' +
     '<tr style="background:#f9f9f9"><td style="padding:10px;font-weight:bold;color:#16a34a;">New Seats</td><td style="padding:10px;color:#16a34a;font-weight:bold;">' + newList + '</td></tr>' +
-    '<tr><td style="padding:10px;font-weight:bold;font-size:18px;">New Total</td><td style="padding:10px;font-size:18px;color:#e63946;"><strong>$' + newTotal.toFixed(2) + '</strong></td></tr>' +
+    '<tr><td style="padding:10px;font-weight:bold;font-size:18px;">New Total</td><td style="padding:10px;font-size:18px;color:#e63946;"><strong>$' + parseFloat(newTotal).toFixed(2) + '</strong></td></tr>' +
     '</table>' +
     '<p style="color:#666;font-size:13px;">Please present your reference number at the cinema entrance.</p>' +
     '</div>' +
