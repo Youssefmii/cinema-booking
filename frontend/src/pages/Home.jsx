@@ -23,7 +23,7 @@ export default function Home() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 bg-white rounded-xl shadow-sm my-4">
       {/* Hero */}
       <div className="mb-10 -mx-4 -mt-8 px-4 pt-16 pb-12 text-center bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700 rounded-b-3xl shadow-lg">
         <h1 className="text-4xl font-bold text-white mb-3">Now Showing</h1>
