@@ -9,16 +9,16 @@ function BookingRow({ booking, onCancel, onRemoveSeat }) {
 
   return (
     <>
-      <tr className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setOpen(!open)}>
+      <tr className="border-b border-white/10 hover:bg-white/10 cursor-pointer" onClick={() => setOpen(!open)}>
         <td className="px-4 py-3 font-mono text-xs text-slate-500">{booking.reference_number}</td>
-        <td className="px-4 py-3 font-medium text-slate-800">{booking.movie_title}</td>
-        <td className="px-4 py-3 text-slate-600">{booking.user_name}</td>
+        <td className="px-4 py-3 font-medium text-white">{booking.movie_title}</td>
+        <td className="px-4 py-3 text-slate-400">{booking.user_name}</td>
         <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{format(new Date(booking.datetime), 'MMM d · h:mm a')}</td>
-        <td className="px-4 py-3 text-slate-600">{booking.hall_name}</td>
+        <td className="px-4 py-3 text-slate-400">{booking.hall_name}</td>
         <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{booking.created_at ? format(new Date(booking.created_at), 'MMM d, yyyy') : '—'}</td>
         <td className="px-4 py-3 font-semibold text-blue-600">${booking.total_price.toFixed(2)}</td>
         <td className="px-4 py-3">
-          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{booking.status}</span>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${booking.status === 'confirmed' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>{booking.status}</span>
         </td>
         <td className="px-4 py-3">
           <div className="flex items-center gap-2">
@@ -33,14 +33,14 @@ function BookingRow({ booking, onCancel, onRemoveSeat }) {
         </td>
       </tr>
       {open && (
-        <tr className="bg-slate-50 border-b border-slate-100">
+        <tr className="bg-white/5 border-b border-white/10">
           <td colSpan={9} className="px-6 py-3 text-sm">
             <div className="flex flex-wrap gap-6">
               <div>
                 <span className="text-slate-400 font-medium">Seats: </span>
                 <div className="inline-flex flex-wrap gap-1 mt-1">
                   {booking.seats.map(s => (
-                    <span key={s.id} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs capitalize">
+                    <span key={s.id} className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-700 px-2 py-0.5 rounded-full text-xs capitalize">
                       {s.row_label}{s.seat_number} ({s.seat_type})
                       {booking.status === 'confirmed' && (
                         <button
@@ -58,10 +58,10 @@ function BookingRow({ booking, onCancel, onRemoveSeat }) {
               {booking.snacks.length > 0 && (
                 <div>
                   <span className="text-slate-400 font-medium">Snacks: </span>
-                  {booking.snacks.map(s => <span key={s.id} className="text-slate-700 mr-3 text-xs">{s.name} ×{s.quantity}</span>)}
+                  {booking.snacks.map(s => <span key={s.id} className="text-slate-200 mr-3 text-xs">{s.name} ×{s.quantity}</span>)}
                 </div>
               )}
-              <div><span className="text-slate-400 font-medium">Email: </span><span className="text-slate-700 text-xs">{booking.user_email}</span></div>
+              <div><span className="text-slate-400 font-medium">Email: </span><span className="text-slate-200 text-xs">{booking.user_email}</span></div>
               {booking.user_customer_number && (
                 <div><span className="text-slate-400 font-medium">Customer ID: </span><span className="text-blue-600 text-xs font-mono font-semibold">{booking.user_customer_number}</span></div>
               )}
@@ -113,24 +113,24 @@ export default function AdminBookings() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Bookings</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">Bookings</h1>
 
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
           <input value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})}
             placeholder="Search reference, user, movie..."
-            className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"/>
+            className="pl-9 pr-4 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"/>
         </div>
         <select value={filters.movie_id} onChange={e => setFilters({...filters, movie_id: e.target.value})}
-          className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          className="px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">All Movies</option>
           {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
         </select>
         <input type="date" value={filters.date} onChange={e => setFilters({...filters, date: e.target.value})}
-          className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          className="px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
         {(filters.movie_id || filters.date || filters.search) && (
-          <button onClick={() => setFilters({ movie_id: '', date: '', search: '' })} className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-700">
+          <button onClick={() => setFilters({ movie_id: '', date: '', search: '' })} className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-200">
             <X size={16}/> Clear
           </button>
         )}
@@ -138,9 +138,9 @@ export default function AdminBookings() {
 
       <div className="text-sm text-slate-500 mb-3">{filtered.length} booking{filtered.length !== 1 ? 's' : ''}</div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+      <div className="bg-white/10 rounded-xl border border-white/15 overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-white/5 border-b border-white/15">
             <tr>{['Reference', 'Movie', 'User', 'Showtime', 'Hall', 'Booked On', 'Total', 'Status', 'Actions'].map(h => (
               <th key={h} className="text-left px-4 py-3 text-slate-500 font-semibold text-xs uppercase whitespace-nowrap">{h}</th>
             ))}</tr>

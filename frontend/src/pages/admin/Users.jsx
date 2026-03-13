@@ -70,7 +70,7 @@ export default function AdminUsers() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Users</h1>
+        <h1 className="text-2xl font-bold text-white">Users</h1>
         <div className="flex items-center gap-3">
           {blacklistedCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-full">
@@ -93,19 +93,19 @@ export default function AdminUsers() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search name, email, customer ID..."
-            className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+            className="pl-9 pr-4 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
           />
         </div>
         <button
           onClick={() => setFilterBlacklisted(!filterBlacklisted)}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
-            filterBlacklisted ? 'bg-red-50 border-red-200 text-red-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+            filterBlacklisted ? 'bg-red-50 border-red-200 text-red-700' : 'border-white/15 text-slate-400 hover:bg-white/10'
           }`}
         >
           <ShieldBan size={15}/> Blacklisted only
         </button>
         {(search || filterBlacklisted) && (
-          <button onClick={() => { setSearch(''); setFilterBlacklisted(false); }} className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-700">
+          <button onClick={() => { setSearch(''); setFilterBlacklisted(false); }} className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-200">
             <X size={16}/> Clear
           </button>
         )}
@@ -113,21 +113,21 @@ export default function AdminUsers() {
 
       <div className="text-sm text-slate-500 mb-3">{filtered.length} user{filtered.length !== 1 ? 's' : ''}</div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+      <div className="bg-white/10 rounded-xl border border-white/15 overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-white/5 border-b border-white/15">
             <tr>{['Customer ID', 'Name', 'Email', 'Role', 'Joined', 'Status', 'Actions'].map(h => (
               <th key={h} className="text-left px-4 py-3 text-slate-500 font-semibold text-xs uppercase whitespace-nowrap">{h}</th>
             ))}</tr>
           </thead>
           <tbody>
             {filtered.map(u => (
-              <tr key={u.id} className={`border-b border-slate-100 hover:bg-slate-50 ${u.is_blacklisted ? 'bg-red-50/30' : ''}`}>
+              <tr key={u.id} className={`border-b border-white/10 hover:bg-white/10 ${u.is_blacklisted ? 'bg-red-50/30' : ''}`}>
                 <td className="px-4 py-3 font-mono text-xs text-blue-600 font-semibold">{u.customer_number || '—'}</td>
-                <td className="px-4 py-3 font-medium text-slate-800">{u.name}</td>
-                <td className="px-4 py-3 text-slate-600 text-xs">{u.email}</td>
+                <td className="px-4 py-3 font-medium text-white">{u.name}</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">{u.email}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-400'}`}>
                     {u.role}
                   </span>
                 </td>
@@ -136,11 +136,11 @@ export default function AdminUsers() {
                 </td>
                 <td className="px-4 py-3">
                   {u.is_blacklisted ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
                       <ShieldBan size={11}/> Blacklisted
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Active</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500/20 text-green-300">Active</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
@@ -148,7 +148,7 @@ export default function AdminUsers() {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => navigate('/admin/book-for-user', { state: { preselectedUser: u } })}
-                        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-700 hover:bg-blue-100 transition-colors"
                         title="Book a ticket for this user"
                       >
                         <Ticket size={12}/> Book
@@ -182,42 +182,42 @@ export default function AdminUsers() {
       {/* Add User Modal */}
       {modal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
-            <div className="flex items-center justify-between p-5 border-b border-slate-200">
-              <h2 className="font-bold text-slate-800 flex items-center gap-2"><UserPlus size={18}/> Add New User</h2>
+          <div className="bg-white/10 rounded-2xl w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between p-5 border-b border-white/15">
+              <h2 className="font-bold text-white flex items-center gap-2"><UserPlus size={18}/> Add New User</h2>
               <button onClick={() => { setModal(false); setForm(emptyForm); }}><X size={22} className="text-slate-400"/></button>
             </div>
             <form onSubmit={createUser} className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Full Name</label>
                 <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})}
                   placeholder="John Smith"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Email</label>
                 <input required type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
                   placeholder="john@example.com"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Password</label>
                 <input required type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
                   placeholder="Minimum 6 characters"
                   minLength={6}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Role</label>
                 <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => { setModal(false); setForm(emptyForm); }}
-                  className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50">
+                  className="flex-1 py-2.5 border border-white/15 rounded-xl text-slate-400 font-medium hover:bg-white/10">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving}

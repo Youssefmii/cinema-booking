@@ -6,9 +6,9 @@ import { format } from 'date-fns';
 import { UserCheck, Search, CheckCircle2 } from 'lucide-react';
 
 const SEAT_COLORS = {
-  standard: { available: 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-blue-100 hover:border-blue-400', selected: 'bg-blue-600 border-blue-600 text-white', booked: 'bg-slate-200 border-slate-200 text-slate-400 cursor-not-allowed' },
-  vip:      { available: 'bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-200', selected: 'bg-amber-500 border-amber-500 text-white', booked: 'bg-slate-200 border-slate-200 text-slate-400 cursor-not-allowed' },
-  couple:   { available: 'bg-pink-50 border-pink-300 text-pink-700 hover:bg-pink-200', selected: 'bg-pink-500 border-pink-500 text-white', booked: 'bg-slate-200 border-slate-200 text-slate-400 cursor-not-allowed' },
+  standard: { available: 'bg-slate-100 border-slate-300 text-slate-200 hover:bg-blue-100 hover:border-blue-400', selected: 'bg-blue-600 border-blue-600 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
+  vip:      { available: 'bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-200', selected: 'bg-amber-500 border-amber-500 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
+  couple:   { available: 'bg-pink-50 border-pink-300 text-pink-700 hover:bg-pink-200', selected: 'bg-pink-500 border-pink-500 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
 };
 
 export default function BookForUser() {
@@ -113,11 +113,11 @@ export default function BookForUser() {
   if (booking) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md w-full shadow-sm">
+        <div className="bg-white/10 rounded-2xl border border-white/15 p-10 text-center max-w-md w-full shadow-sm">
           <CheckCircle2 size={56} className="text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-slate-800 mb-1">Booking Created!</h2>
+          <h2 className="text-2xl font-bold text-white mb-1">Booking Created!</h2>
           <p className="text-slate-500 mb-6">Confirmation email sent to <strong>{resolvedUser?.email}</strong></p>
-          <div className="bg-slate-50 rounded-xl p-4 text-left space-y-2 mb-6 text-sm">
+          <div className="bg-white/5 rounded-xl p-4 text-left space-y-2 mb-6 text-sm">
             <div className="flex justify-between"><span className="text-slate-500">Reference</span><span className="font-mono font-semibold">{booking.reference}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">User</span><span className="font-semibold">{booking.user_name}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">Total</span><span className="font-bold text-blue-600">${booking.total.toFixed(2)}</span></div>
@@ -132,13 +132,13 @@ export default function BookForUser() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+      <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
         <UserCheck size={24} className="text-blue-600" /> Book for User
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {/* User email lookup */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
+        <div className="bg-white/10 rounded-xl border border-white/15 p-4">
           <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">User Email</label>
           <div className="flex gap-2">
             <input
@@ -146,7 +146,7 @@ export default function BookForUser() {
               onChange={e => { setEmail(e.target.value); setResolvedUser(null); }}
               onKeyDown={e => e.key === 'Enter' && lookupUser()}
               placeholder="user@example.com"
-              className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={lookupUser}
@@ -166,12 +166,12 @@ export default function BookForUser() {
         </div>
 
         {/* Showtime picker */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
+        <div className="bg-white/10 rounded-xl border border-white/15 p-4">
           <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">Showtime</label>
           <select
             value={showtimeId}
             onChange={e => setShowtimeId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select a showtime...</option>
             {showtimes.map(s => (
@@ -182,9 +182,9 @@ export default function BookForUser() {
           </select>
           {showtime && (
             <div className="mt-2.5 flex flex-wrap gap-3 text-xs text-slate-500">
-              <span>Standard <strong className="text-slate-700">${showtime.price_standard}</strong></span>
-              <span>VIP <strong className="text-slate-700">${showtime.price_vip}</strong></span>
-              <span>Couple <strong className="text-slate-700">${showtime.price_couple}</strong></span>
+              <span>Standard <strong className="text-slate-200">${showtime.price_standard}</strong></span>
+              <span>VIP <strong className="text-slate-200">${showtime.price_vip}</strong></span>
+              <span>Couple <strong className="text-slate-200">${showtime.price_couple}</strong></span>
             </div>
           )}
         </div>
@@ -192,7 +192,7 @@ export default function BookForUser() {
 
       {/* Seat grid */}
       {seats.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+        <div className="bg-white/10 rounded-xl border border-white/15 p-6 mb-6">
           {/* Screen */}
           <div className="text-center mb-8">
             <div className="inline-block w-2/3 h-3 bg-gradient-to-b from-blue-200 to-blue-100 rounded-t-full"></div>
@@ -245,12 +245,12 @@ export default function BookForUser() {
 
       {/* Summary + Book button */}
       {selected.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white/10 rounded-xl border border-white/15 p-4 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs text-slate-500 font-semibold uppercase mb-1">Selected Seats</p>
             <div className="flex flex-wrap gap-1.5">
               {selected.map(s => (
-                <span key={s.id} className="text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded px-2 py-0.5 font-mono">
+                <span key={s.id} className="text-xs bg-blue-500/10 text-blue-700 border border-blue-200 rounded px-2 py-0.5 font-mono">
                   {s.row_label}{s.seat_number} ({s.seat_type})
                 </span>
               ))}
@@ -273,7 +273,7 @@ export default function BookForUser() {
       )}
 
       {!showtimeId && (
-        <div className="text-center py-16 text-slate-400 bg-white rounded-xl border border-slate-200">
+        <div className="text-center py-16 text-slate-400 bg-white/10 rounded-xl border border-white/15">
           <UserCheck size={40} className="mx-auto mb-3 opacity-30" />
           <p>Enter a user email and select a showtime to begin</p>
         </div>

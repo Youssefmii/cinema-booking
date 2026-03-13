@@ -73,26 +73,26 @@ export default function AdminShowtimes() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Showtimes</h1>
+        <h1 className="text-2xl font-bold text-white">Showtimes</h1>
         <button onClick={() => setModal(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-700 text-sm">
           <Plus size={18}/> Add Showtime
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+      <div className="bg-white/10 rounded-xl border border-white/15 overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-white/5 border-b border-white/15">
             <tr>{['Movie', 'Hall', 'Date & Time', 'Standard', 'VIP', 'Couple', 'Action'].map(h => (
               <th key={h} className="text-left px-4 py-3 text-slate-500 font-semibold text-xs uppercase whitespace-nowrap">{h}</th>
             ))}</tr>
           </thead>
           <tbody>
             {showtimes.map(st => (
-              <tr key={st.id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-800">{st.movie_title}</td>
-                <td className="px-4 py-3 text-slate-600">{st.hall_name}</td>
-                <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{format(new Date(st.datetime), 'MMM d, yyyy h:mm a')}</td>
-                <td className="px-4 py-3 text-slate-700">${st.price_standard}</td>
+              <tr key={st.id} className="border-b border-white/10 hover:bg-white/10">
+                <td className="px-4 py-3 font-medium text-white">{st.movie_title}</td>
+                <td className="px-4 py-3 text-slate-400">{st.hall_name}</td>
+                <td className="px-4 py-3 text-slate-400 whitespace-nowrap">{format(new Date(st.datetime), 'MMM d, yyyy h:mm a')}</td>
+                <td className="px-4 py-3 text-slate-200">${st.price_standard}</td>
                 <td className="px-4 py-3 text-amber-600">${st.price_vip}</td>
                 <td className="px-4 py-3 text-pink-600">${st.price_couple}</td>
                 <td className="px-4 py-3">
@@ -107,63 +107,63 @@ export default function AdminShowtimes() {
 
       {modal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-5 border-b border-slate-200">
-              <h2 className="font-bold text-slate-800">Add Showtime</h2>
+          <div className="bg-white/10 rounded-2xl w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-white/15">
+              <h2 className="font-bold text-white">Add Showtime</h2>
               <button onClick={() => { setModal(false); setForm(emptyForm); }}><X size={22} className="text-slate-400"/></button>
             </div>
             <form onSubmit={save} className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Movie</label>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Movie</label>
                 <select required value={form.movie_id} onChange={e => setForm({...form, movie_id: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                   <option value="">Select movie</option>
                   {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Hall</label>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Hall</label>
                 <select required value={form.hall_id} onChange={e => setForm({...form, hall_id: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                   <option value="">Select hall</option>
                   {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-200 mb-1">
                   {form.recurring ? 'Start Date & Time' : 'Date & Time'}
                 </label>
                 <input type="datetime-local" required
                   min={now()}
                   value={form.datetime}
                   onChange={e => setForm({...form, datetime: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
 
               {/* Recurring toggle */}
-              <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <div className="bg-white/5 rounded-xl p-3 border border-white/15">
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <input type="checkbox" checked={form.recurring} onChange={e => setForm({...form, recurring: e.target.checked})}
                     className="w-4 h-4 accent-blue-600"/>
-                  <span className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-slate-200">
                     <RefreshCw size={15}/> Recurring showtime
                   </span>
                 </label>
                 {form.recurring && (
                   <div className="mt-3 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">Repeat every</label>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">Repeat every</label>
                       <select value={form.repeat_type} onChange={e => setForm({...form, repeat_type: e.target.value})}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        className="w-full px-3 py-2 rounded-lg border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="daily">Day</option>
                         <option value="weekly">Week</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">Number of times</label>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">Number of times</label>
                       <input type="number" min="2" max="60" value={form.repeat_count}
                         onChange={e => setForm({...form, repeat_count: e.target.value})}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                        className="w-full px-3 py-2 rounded-lg border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                     </div>
                   </div>
                 )}
@@ -172,14 +172,14 @@ export default function AdminShowtimes() {
               <div className="grid grid-cols-3 gap-3">
                 {[['price_standard','Standard ($)'],['price_vip','VIP ($)'],['price_couple','Couple ($)']].map(([k,l]) => (
                   <div key={k}>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">{l}</label>
+                    <label className="block text-xs font-medium text-slate-200 mb-1">{l}</label>
                     <input type="number" min="0" step="0.5" required value={form[k]} onChange={e => setForm({...form, [k]: e.target.value})}
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
                   </div>
                 ))}
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => { setModal(false); setForm(emptyForm); }} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-medium">Cancel</button>
+                <button type="button" onClick={() => { setModal(false); setForm(emptyForm); }} className="flex-1 py-2.5 border border-white/15 rounded-xl text-slate-400 font-medium">Cancel</button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-medium disabled:opacity-70">
                   {saving ? 'Saving...' : form.recurring ? `Create ${form.repeat_count} Showtimes` : 'Save'}
                 </button>

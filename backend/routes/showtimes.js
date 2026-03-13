@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
       FROM showtimes s
       JOIN movies m ON s.movie_id = m.id
       JOIN halls h ON s.hall_id = h.id
-      WHERE m.is_active = TRUE
+      WHERE m.is_active = TRUE AND s.datetime > NOW()
     `;
     const params = [];
     if (movie_id) {

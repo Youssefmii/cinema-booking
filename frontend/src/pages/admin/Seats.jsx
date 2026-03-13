@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 const TYPE_STYLES = {
   vip:      { base: 'bg-amber-100 border-amber-400 text-amber-800',  selected: 'bg-amber-400 border-amber-500 text-white' },
   couple:   { base: 'bg-pink-100 border-pink-400 text-pink-800',     selected: 'bg-pink-400 border-pink-500 text-white'   },
-  standard: { base: 'bg-slate-100 border-slate-300 text-slate-700',  selected: 'bg-blue-500 border-blue-600 text-white'   },
+  standard: { base: 'bg-slate-100 border-slate-300 text-slate-200',  selected: 'bg-blue-500 border-blue-600 text-white'   },
 };
 const BOOKED = 'bg-slate-200 border-slate-300 text-slate-400 opacity-60 cursor-not-allowed';
 
@@ -78,15 +78,15 @@ export default function AdminSeats() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+      <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
         <Armchair size={24} className="text-blue-600" /> Seat Management
       </h1>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6 flex flex-wrap gap-4 items-end">
+      <div className="bg-white/10 rounded-xl border border-white/15 p-4 mb-6 flex flex-wrap gap-4 items-end">
         <div className="flex-1 min-w-[180px]">
           <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Hall</label>
           <select value={selectedHall} onChange={e => { setSelectedHall(e.target.value); setSelectedShowtime(''); setEditingSeat(null); }}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Select a hall</option>
             {halls.map(h => <option key={h.id} value={h.id}>{h.name} ({h.rows * h.seats_per_row} seats)</option>)}
           </select>
@@ -95,7 +95,7 @@ export default function AdminSeats() {
           <div className="flex-1 min-w-[220px]">
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Showtime — check availability</label>
             <select value={selectedShowtime} onChange={e => setSelectedShowtime(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">All seats (layout view)</option>
               {hallShowtimes.map(s => (
                 <option key={s.id} value={s.id}>{s.movie_title} — {format(new Date(s.datetime), 'MMM d, h:mm a')}</option>
@@ -106,11 +106,11 @@ export default function AdminSeats() {
         {selectedHall && (
           <div className="flex gap-2">
             <button onClick={() => { setMode('view'); setEditingSeat(null); }}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors ${mode === 'view' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors ${mode === 'view' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white/10 text-slate-400 border-white/15 hover:bg-white/10'}`}>
               <Eye size={15} /> View
             </button>
             <button onClick={() => { setMode('edit'); setSelectedShowtime(''); }}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors ${mode === 'edit' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors ${mode === 'edit' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white/10 text-slate-400 border-white/15 hover:bg-white/10'}`}>
               <Edit2 size={15} /> Edit Types
             </button>
           </div>
@@ -125,7 +125,7 @@ export default function AdminSeats() {
       )}
 
       {!selectedHall ? (
-        <div className="text-center py-20 bg-white rounded-xl border border-slate-200 text-slate-400">
+        <div className="text-center py-20 bg-white/10 rounded-xl border border-white/15 text-slate-400">
           <Armchair size={48} className="mx-auto mb-3 opacity-30" />
           <p className="font-medium">Select a hall to view its seating layout</p>
         </div>
@@ -135,13 +135,13 @@ export default function AdminSeats() {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
             {[
-              { label: 'Total',    value: stats.total,    cls: 'bg-blue-50 text-blue-700'    },
-              { label: 'Standard', value: stats.standard, cls: 'bg-slate-100 text-slate-700' },
+              { label: 'Total',    value: stats.total,    cls: 'bg-blue-500/10 text-blue-700'    },
+              { label: 'Standard', value: stats.standard, cls: 'bg-slate-100 text-slate-200' },
               { label: 'VIP',      value: stats.vip,      cls: 'bg-amber-100 text-amber-700' },
               { label: 'Couple',   value: stats.couple,   cls: 'bg-pink-100 text-pink-700'   },
               ...(selectedShowtime ? [
-                { label: 'Booked',    value: stats.booked,    cls: 'bg-red-100 text-red-700'     },
-                { label: 'Available', value: stats.available, cls: 'bg-green-100 text-green-700' },
+                { label: 'Booked',    value: stats.booked,    cls: 'bg-red-500/20 text-red-300'     },
+                { label: 'Available', value: stats.available, cls: 'bg-green-500/20 text-green-300' },
               ] : []),
             ].map(s => (
               <div key={s.label} className={`rounded-xl p-3 text-center ${s.cls}`}>
@@ -151,14 +151,14 @@ export default function AdminSeats() {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-4 text-xs text-slate-600">
+          <div className="flex flex-wrap gap-4 mb-4 text-xs text-slate-400">
             <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded border bg-slate-100 border-slate-300 inline-block"></span>Standard</span>
             <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded border bg-amber-100 border-amber-400 inline-block"></span>VIP</span>
             <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded border bg-pink-100 border-pink-400 inline-block"></span>Couple</span>
             {selectedShowtime && <span className="flex items-center gap-1.5"><span className="w-4 h-4 rounded border bg-slate-200 opacity-60 inline-block"></span>Booked</span>}
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-6 overflow-x-auto flex flex-col items-center">
+          <div className="bg-white/10 rounded-xl border border-white/15 p-6 overflow-x-auto flex flex-col items-center">
             <div className="text-center mb-8 w-full">
               <div className="inline-block w-2/3 h-3 bg-gradient-to-b from-blue-200 to-blue-100 rounded-t-full"></div>
               <p className="text-xs text-slate-400 mt-1 tracking-widest uppercase">Screen</p>
@@ -193,8 +193,8 @@ export default function AdminSeats() {
           </div>
 
           {mode === 'edit' && editingSeat && (
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 flex items-center gap-3 z-50">
-              <span className="text-sm font-semibold text-slate-700">
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/10 rounded-2xl shadow-2xl border border-white/15 p-4 flex items-center gap-3 z-50">
+              <span className="text-sm font-semibold text-slate-200">
                 Change {editingSeat.row_label}{editingSeat.seat_number} to:
               </span>
               {['standard', 'vip', 'couple'].map(type => (
@@ -202,13 +202,13 @@ export default function AdminSeats() {
                   className={`px-4 py-2 rounded-xl text-sm font-semibold border capitalize transition-colors ${
                     type === 'vip'    ? 'bg-amber-100 border-amber-400 text-amber-800 hover:bg-amber-200' :
                     type === 'couple' ? 'bg-pink-100 border-pink-400 text-pink-800 hover:bg-pink-200' :
-                                       'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                                       'bg-slate-100 border-slate-300 text-slate-200 hover:bg-slate-200'
                   }`}>
                   {type}
                 </button>
               ))}
               <button onClick={() => setEditingSeat(null)}
-                className="ml-2 text-slate-400 hover:text-slate-600 text-xl font-bold leading-none">×</button>
+                className="ml-2 text-slate-400 hover:text-slate-400 text-xl font-bold leading-none">×</button>
             </div>
           )}
         </>
