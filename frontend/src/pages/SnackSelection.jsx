@@ -44,7 +44,7 @@ export default function SnackSelection() {
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
         <ShoppingBag size={24} className="text-blue-600" />
-        <h1 className="text-2xl font-bold text-slate-800">Add Snacks</h1>
+        <h1 className="text-2xl font-bold text-white">Add Snacks</h1>
         <span className="text-slate-400 text-sm">— Optional</span>
       </div>
 
@@ -57,16 +57,16 @@ export default function SnackSelection() {
             {available.filter(s => s.category === cat).map(snack => {
               const qty = quantities[snack.id] || 0;
               return (
-                <div key={snack.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between">
+                <div key={snack.id} className="bg-white/10 border border-white/15 rounded-xl p-4 flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-slate-800">{snack.name}</div>
+                    <div className="font-medium text-white">{snack.name}</div>
                     <div className="text-blue-600 font-semibold text-sm">${snack.price.toFixed(2)}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => change(snack.id, -1)} disabled={qty === 0} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-40">
+                    <button onClick={() => change(snack.id, -1)} disabled={qty === 0} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-white/20 disabled:opacity-40">
                       <Minus size={14} />
                     </button>
-                    <span className="w-6 text-center font-semibold text-slate-700">{qty}</span>
+                    <span className="w-6 text-center font-semibold text-slate-200">{qty}</span>
                     <button onClick={() => change(snack.id, 1)} className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700">
                       <Plus size={14} />
                     </button>
@@ -79,7 +79,7 @@ export default function SnackSelection() {
       ))}
 
       {snackTotal > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4 text-sm text-blue-700 font-medium">
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 mb-4 text-sm text-blue-300 font-medium">
           Snacks total: <strong>${snackTotal.toFixed(2)}</strong>
         </div>
       )}
@@ -89,7 +89,7 @@ export default function SnackSelection() {
           Continue to Summary <ChevronRight size={20} />
         </button>
         <button onClick={() => { setSnacks([]); navigate(`/booking/${showtimeId}/summary`); }}
-          className="py-3 px-5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50">
+          className="py-3 px-5 border border-slate-200 text-slate-400 rounded-xl font-medium hover:bg-white/10">
           Skip
         </button>
       </div>

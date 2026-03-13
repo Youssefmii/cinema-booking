@@ -44,6 +44,7 @@ export default function App() {
             <div className="orb orb-6" />
           </div>
 
+          <div className="content-layer">
           <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
           <Navbar />
           <div className="min-h-screen">
@@ -76,6 +77,7 @@ export default function App() {
               <Route path="users" element={<AdminUsers />} />
             </Route>
           </Routes>
+          </div>
           </div>
 
         </BookingProvider>

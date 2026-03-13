@@ -43,14 +43,14 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-blue-600">Login</Link>
+              <Link to="/login" className="text-sm font-medium text-white/80 hover:text-blue-300">Login</Link>
               <Link to="/register" className="bg-blue-500/90 backdrop-blur text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">Sign Up</Link>
             </>
           )}
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden text-slate-600" onClick={() => setOpen(!open)}>
+        <button className="md:hidden text-white/80" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>

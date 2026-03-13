@@ -82,33 +82,33 @@ export default function SeatSelection() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {st && (
-        <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
+        <div className="bg-white/10 rounded-xl border border-white/15 p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-800">{st.movie_title}</h1>
-            <div className="flex gap-4 text-sm text-slate-500 mt-1">
+            <h1 className="text-xl font-bold text-white">{st.movie_title}</h1>
+            <div className="flex gap-4 text-sm text-slate-400 mt-1">
               <span className="flex items-center gap-1"><Clock size={14} /> {format(new Date(st.datetime), 'EEE, MMM d · h:mm a')}</span>
               <span className="flex items-center gap-1"><MapPin size={14} /> {st.hall_name}</span>
             </div>
           </div>
           <div className="text-right">
             {isFullyBooked ? (
-              <span className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full">SOLD OUT</span>
+              <span className="bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold px-3 py-1 rounded-full">SOLD OUT</span>
             ) : (
-              <div className="text-sm text-slate-500">{selected.length} seat{selected.length !== 1 ? 's' : ''} selected</div>
+              <div className="text-sm text-slate-400">{selected.length} seat{selected.length !== 1 ? 's' : ''} selected</div>
             )}
           </div>
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+      <div className="bg-white/10 rounded-xl border border-white/15 p-6 mb-6">
         <SeatGrid seats={seats} />
       </div>
 
       {isFullyBooked ? (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6 text-center">
           <BellRing size={36} className="mx-auto text-amber-500 mb-3" />
-          <h2 className="text-lg font-bold text-slate-800 mb-1">This show is sold out</h2>
-          <p className="text-slate-500 text-sm mb-4">
+          <h2 className="text-lg font-bold text-white mb-1">This show is sold out</h2>
+          <p className="text-slate-400 text-sm mb-4">
             Join the waitlist and we will email you instantly if a seat becomes available.
           </p>
           {waitlistEntry ? (
@@ -137,11 +137,11 @@ export default function SeatSelection() {
       ) : (
         <>
           {selected.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-              <h3 className="font-semibold text-blue-800 mb-2">Selected Seats</h3>
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
+              <h3 className="font-semibold text-blue-300 mb-2">Selected Seats</h3>
               <div className="flex flex-wrap gap-2">
                 {selected.map(s => (
-                  <span key={s.id} className="bg-white border border-blue-200 text-blue-700 text-sm px-3 py-1 rounded-full font-medium">
+                  <span key={s.id} className="bg-blue-500/20 border border-blue-500/30 text-blue-200 text-sm px-3 py-1 rounded-full font-medium">
                     {s.row_label}{s.seat_number} <span className="text-blue-400 capitalize">({s.seat_type})</span>
                   </span>
                 ))}

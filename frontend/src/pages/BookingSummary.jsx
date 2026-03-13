@@ -45,13 +45,13 @@ export default function BookingSummary() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Booking Summary</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">Booking Summary</h1>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
+      <div className="bg-white/10 rounded-xl border border-white/15 overflow-hidden mb-4">
         {/* Movie */}
-        <div className="p-5 border-b border-slate-100">
+        <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold mb-2"><Film size={16}/> Movie</div>
-          <div className="font-bold text-slate-800 text-lg">{st.movie_title}</div>
+          <div className="font-bold text-white text-lg">{st.movie_title}</div>
           <div className="flex gap-4 text-sm text-slate-500 mt-1">
             <span className="flex items-center gap-1"><Clock size={13}/>{format(new Date(st.datetime), 'EEE, MMM d · h:mm a')}</span>
             <span className="flex items-center gap-1"><MapPin size={13}/>{st.hall_name}</span>
@@ -59,19 +59,19 @@ export default function BookingSummary() {
         </div>
 
         {/* Seats */}
-        <div className="p-5 border-b border-slate-100">
+        <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold mb-3"><Armchair size={16}/> Seats</div>
           <div className="space-y-1">
             {bookingData.selectedSeats.map(s => {
               const price = s.seat_type === 'vip' ? st.price_vip : s.seat_type === 'couple' ? st.price_couple : st.price_standard;
               return (
                 <div key={s.id} className="flex justify-between text-sm">
-                  <span className="text-slate-700">{s.row_label}{s.seat_number} <span className="capitalize text-slate-400">({s.seat_type})</span></span>
-                  <span className="font-medium text-slate-800">${price.toFixed(2)}</span>
+                  <span className="text-slate-300">{s.row_label}{s.seat_number} <span className="capitalize text-slate-400">({s.seat_type})</span></span>
+                  <span className="font-medium text-white">${price.toFixed(2)}</span>
                 </div>
               );
             })}
-            <div className="flex justify-between text-sm font-semibold pt-1 border-t border-slate-100 mt-1">
+            <div className="flex justify-between text-sm font-semibold pt-1 border-t border-white/10 mt-1">
               <span>Seats subtotal</span><span>${seatTotal.toFixed(2)}</span>
             </div>
           </div>
@@ -79,16 +79,16 @@ export default function BookingSummary() {
 
         {/* Snacks */}
         {bookingData.selectedSnacks.length > 0 && (
-          <div className="p-5 border-b border-slate-100">
+          <div className="p-5 border-b border-white/10">
             <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold mb-3"><ShoppingBag size={16}/> Snacks</div>
             <div className="space-y-1">
               {bookingData.selectedSnacks.map(s => (
                 <div key={s.id} className="flex justify-between text-sm">
-                  <span className="text-slate-700">{s.name} <span className="text-slate-400">×{s.quantity}</span></span>
-                  <span className="font-medium text-slate-800">${(s.price * s.quantity).toFixed(2)}</span>
+                  <span className="text-slate-300">{s.name} <span className="text-slate-400">×{s.quantity}</span></span>
+                  <span className="font-medium text-white">${(s.price * s.quantity).toFixed(2)}</span>
                 </div>
               ))}
-              <div className="flex justify-between text-sm font-semibold pt-1 border-t border-slate-100 mt-1">
+              <div className="flex justify-between text-sm font-semibold pt-1 border-t border-white/10 mt-1">
                 <span>Snacks subtotal</span><span>${snackTotal.toFixed(2)}</span>
               </div>
             </div>
@@ -96,9 +96,9 @@ export default function BookingSummary() {
         )}
 
         {/* Total */}
-        <div className="p-5 bg-slate-50">
+        <div className="p-5 bg-white/5">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-bold text-slate-800">Total</span>
+            <span className="text-lg font-bold text-white">Total</span>
             <span className="text-2xl font-bold text-blue-600">${total().toFixed(2)}</span>
           </div>
           <p className="text-xs text-slate-400 mt-1">Booking for: {user?.name} ({user?.email})</p>

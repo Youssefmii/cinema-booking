@@ -27,12 +27,12 @@ export default function BookingConfirmation() {
         <div className="flex justify-center mb-4">
           <CheckCircle size={64} className="text-green-500" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Booking Confirmed!</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Booking Confirmed!</h1>
         <p className="text-slate-500">A confirmation email has been sent to your inbox.</p>
       </div>
 
       {/* Ticket card */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-lg mb-6">
+      <div className="bg-white/10 rounded-2xl border border-white/15 overflow-hidden shadow-lg mb-6">
         {/* Reference banner */}
         <div className="bg-blue-600 text-white p-5 text-center">
           <p className="text-sm opacity-80 mb-1">Booking Reference</p>
@@ -45,7 +45,7 @@ export default function BookingConfirmation() {
             <Film size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-xs text-slate-400 uppercase font-semibold">Movie</p>
-              <p className="font-bold text-slate-800">{booking.movie_title}</p>
+              <p className="font-bold text-white">{booking.movie_title}</p>
             </div>
           </div>
 
@@ -54,15 +54,15 @@ export default function BookingConfirmation() {
               <Clock size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs text-slate-400 uppercase font-semibold">Showtime</p>
-                <p className="font-medium text-slate-800">{format(new Date(booking.datetime), 'EEE, MMM d')}</p>
-                <p className="text-slate-600">{format(new Date(booking.datetime), 'h:mm a')}</p>
+                <p className="font-medium text-white">{format(new Date(booking.datetime), 'EEE, MMM d')}</p>
+                <p className="text-slate-400">{format(new Date(booking.datetime), 'h:mm a')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <MapPin size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs text-slate-400 uppercase font-semibold">Hall</p>
-                <p className="font-medium text-slate-800">{booking.hall_name}</p>
+                <p className="font-medium text-white">{booking.hall_name}</p>
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@ export default function BookingConfirmation() {
             <p className="text-xs text-slate-400 uppercase font-semibold mb-2">Seats</p>
             <div className="flex flex-wrap gap-2">
               {booking.seats.map(s => (
-                <span key={s.id} className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm font-medium capitalize">
+                <span key={s.id} className="bg-blue-500/20 border border-blue-500/30 text-blue-200 px-3 py-1 rounded-full text-sm font-medium capitalize">
                   {s.row_label}{s.seat_number} ({s.seat_type})
                 </span>
               ))}
@@ -85,7 +85,7 @@ export default function BookingConfirmation() {
               <p className="text-xs text-slate-400 uppercase font-semibold mb-2">Snacks</p>
               <div className="space-y-1">
                 {booking.snacks.map(s => (
-                  <div key={s.id} className="flex justify-between text-sm text-slate-700">
+                  <div key={s.id} className="flex justify-between text-sm text-slate-300">
                     <span>{s.name} ×{s.quantity}</span>
                     <span>${(s.price * s.quantity).toFixed(2)}</span>
                   </div>
@@ -95,15 +95,15 @@ export default function BookingConfirmation() {
           )}
 
           {/* Total */}
-          <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
-            <span className="font-bold text-slate-800">Total Paid</span>
+          <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+            <span className="font-bold text-white">Total Paid</span>
             <span className="text-xl font-bold text-blue-600">${booking.total_price.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
       <div className="flex gap-3">
-        <Link to="/profile" className="flex-1 py-3 border border-blue-600 text-blue-600 rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:bg-blue-50">
+        <Link to="/profile" className="flex-1 py-3 border border-blue-500/50 text-blue-300 rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:bg-blue-500/10">
           <Ticket size={18} /> My Bookings
         </Link>
         <Link to="/" className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:bg-blue-700">

@@ -26,16 +26,16 @@ function BookingCard({ booking, onCancel }) {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-      <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50" onClick={() => setOpen(!open)}>
+    <div className="bg-white/10 border border-white/15 rounded-xl overflow-hidden">
+      <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/10" onClick={() => setOpen(!open)}>
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-300'}`}>
               {booking.status}
             </span>
             <span className="text-xs text-slate-400 font-mono">{booking.reference_number}</span>
           </div>
-          <h3 className="font-bold text-slate-800">{booking.movie_title}</h3>
+          <h3 className="font-bold text-white">{booking.movie_title}</h3>
           <div className="flex gap-4 text-sm text-slate-500 mt-0.5">
             <span className="flex items-center gap-1"><Clock size={13}/>{format(new Date(booking.datetime), 'MMM d, h:mm a')}</span>
             <span className="flex items-center gap-1"><MapPin size={13}/>{booking.hall_name}</span>
@@ -48,14 +48,14 @@ function BookingCard({ booking, onCancel }) {
       </div>
 
       {open && (
-        <div className="border-t border-slate-100 px-4 py-3 bg-slate-50 space-y-3">
+        <div className="border-t border-white/10 px-4 py-3 bg-white/5 space-y-3">
           {/* Seats */}
           {booking.seats && booking.seats.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Seats</p>
               <div className="flex flex-wrap gap-2">
                 {booking.seats.map(seat => (
-                  <span key={seat.id} className="text-xs bg-white border border-slate-200 rounded px-2 py-0.5 font-mono">
+                  <span key={seat.id} className="text-xs bg-white/10 border border-white/15 rounded px-2 py-0.5 font-mono">
                     {seat.row_label}{seat.seat_number} <span className="text-slate-400">({seat.seat_type})</span>
                   </span>
                 ))}
@@ -69,7 +69,7 @@ function BookingCard({ booking, onCancel }) {
               <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Snacks</p>
               <div className="flex flex-wrap gap-2">
                 {booking.snacks.map(snack => (
-                  <span key={snack.id} className="text-xs bg-white border border-slate-200 rounded px-2 py-0.5">
+                  <span key={snack.id} className="text-xs bg-white/10 border border-white/15 rounded px-2 py-0.5">
                     {snack.name} ×{snack.quantity}
                   </span>
                 ))}
@@ -84,13 +84,13 @@ function BookingCard({ booking, onCancel }) {
               {!showConfirm ? (
                 <button
                   onClick={() => setShowConfirm(true)}
-                  className="flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium"
+                  className="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 font-medium"
                 >
                   <XCircle size={15}/> Cancel Booking
                 </button>
               ) : (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-600">Are you sure?</span>
+                  <span className="text-sm text-slate-400">Are you sure?</span>
                   <button
                     onClick={handleCancel}
                     disabled={cancelling}
@@ -100,7 +100,7 @@ function BookingCard({ booking, onCancel }) {
                   </button>
                   <button
                     onClick={() => setShowConfirm(false)}
-                    className="text-sm text-slate-500 hover:text-slate-700"
+                    className="text-sm text-slate-500 hover:text-slate-200"
                   >
                     Keep it
                   </button>
@@ -136,12 +136,12 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-6 flex items-center gap-4">
+      <div className="bg-white/10 border border-white/15 rounded-2xl p-5 mb-6 flex items-center gap-4">
         <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
           {user?.name?.[0]?.toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-slate-800">{user?.name}</h1>
+          <h1 className="text-xl font-bold text-white">{user?.name}</h1>
           <p className="text-slate-500 text-sm truncate">{user?.email}</p>
         </div>
         {user?.customer_number && (
@@ -157,11 +157,11 @@ export default function Profile() {
       </div>
 
       {isBlacklisted && (
-        <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3 items-start">
-          <ShieldBan size={20} className="text-red-600 flex-shrink-0 mt-0.5"/>
+        <div className="mb-5 bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex gap-3 items-start">
+          <ShieldBan size={20} className="text-red-400 flex-shrink-0 mt-0.5"/>
           <div>
-            <p className="font-semibold text-red-700 text-sm">Account Restricted</p>
-            <p className="text-red-600 text-sm mt-0.5">
+            <p className="font-semibold text-red-300 text-sm">Account Restricted</p>
+            <p className="text-red-400 text-sm mt-0.5">
               Your account has been restricted due to a late cancellation (within 2 hours of showtime).
               You cannot book directly — please visit the cinema or contact staff to book on your behalf.
             </p>
@@ -169,7 +169,7 @@ export default function Profile() {
         </div>
       )}
 
-      <h2 className="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
+      <h2 className="text-lg font-semibold text-slate-200 mb-3 flex items-center gap-2">
         <Ticket size={18}/> My Bookings
       </h2>
 

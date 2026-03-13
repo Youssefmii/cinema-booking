@@ -9,30 +9,38 @@
   box-sizing: border-box;
 }
 
-html, body {
-  background-color: #0f172a;
+html {
+  background-color: #0f172a !important;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #0f172a !important;
   color: #e2e8f0;
   min-height: 100vh;
 }
 
-/* ── Solid dark background ── */
+/* ── Animated background ── */
 .animated-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   background-color: #0f172a;
+  pointer-events: none;
 }
 
 .animated-bg::before { display: none; }
 .animated-bg::after  { display: none; }
 
-/* ── Floating orbs on top of photo ── */
+/* Content sits above the animated bg */
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Floating orbs ── */
 .orb {
   position: absolute;
   border-radius: 50%;
