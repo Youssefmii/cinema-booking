@@ -68,10 +68,14 @@ export default function AdminShowtimes() {
   };
 
   const del = async (id) => {
-    if (!confirm('Delete this showtime?')) return;
-    await api.delete(`/showtimes/${id}`);
-    toast.success('Deleted');
-    load();
+    if (!confirm('Delete this showtime? Any associated bookings will also be removed.')) return;
+    try {
+      await api.delete(`/showtimes/${id}`);
+      toast.success('Showtime deleted');
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not delete showtime');
+    }
   };
 
   return (

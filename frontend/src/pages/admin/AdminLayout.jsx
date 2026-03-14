@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Film, Clock, Building2, ShoppingBag, Ticket, LayoutDashboard, Armchair, UserCheck, Users } from 'lucide-react';
+import { Film, Clock, Building2, ShoppingBag, Ticket, LayoutDashboard, Armchair, UserCheck, Users, BellRing } from 'lucide-react';
 
 const links = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -10,6 +10,7 @@ const links = [
   { to: '/admin/bookings', label: 'Bookings', icon: Ticket },
   { to: '/admin/seats', label: 'Seats', icon: Armchair },
   { to: '/admin/book-for-user', label: 'Book for User', icon: UserCheck },
+  { to: '/admin/waitlist', label: 'Waitlist', icon: BellRing },
   { to: '/admin/users', label: 'Users', icon: Users },
 ];
 

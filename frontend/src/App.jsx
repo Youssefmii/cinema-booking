@@ -27,6 +27,7 @@ import AdminBookings from './pages/admin/Bookings';
 import AdminSeats from './pages/admin/Seats';
 import BookForUser from './pages/admin/BookForUser';
 import AdminUsers from './pages/admin/Users';
+import AdminWaitlist from './pages/admin/Waitlist';
 
 export default function App() {
   return (
@@ -74,6 +75,7 @@ export default function App() {
               <Route path="seats" element={<AdminSeats />} />
               <Route path="bookings" element={<AdminBookings />} />
               <Route path="book-for-user" element={<BookForUser />} />
+              <Route path="waitlist" element={<AdminWaitlist />} />
               <Route path="users" element={<AdminUsers />} />
             </Route>
           </Routes>
