@@ -27,16 +27,21 @@ export default function SeatSelection() {
     }
     const loadData = async () => {
       try {
-        const [stRes, sRes, wRes] = await Promise.all([
+        const [stRes, sRes] = await Promise.all([
           api.get(`/showtimes/${showtimeId}`),
           api.get(`/seats/showtime/${showtimeId}`),
-          api.get(`/waitlist/check/${showtimeId}`),
         ]);
         if (!bookingData.showtime || bookingData.showtime.id !== stRes.data.id) {
           setShowtime(stRes.data);
         }
         setSeats(sRes.data);
-        if (wRes.data.onWaitlist) setWaitlistEntry(wRes.data.entry);
+        // Check waitlist separately so errors don't break seat loading
+        try {
+          const wRes = await api.get(`/waitlist/check/${showtimeId}`);
+          if (wRes.data.onWaitlist) setWaitlistEntry(wRes.data.entry);
+        } catch (e) {
+          // Waitlist check failed — user can still join later
+        }
       } finally {
         setLoading(false);
       }

@@ -4,6 +4,39 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Admin: get all waitlist entries (must be before /:id routes)
+router.get('/admin/all', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    const { rows } = await pool.query(`
+      SELECT w.*, u.name as user_name, u.email as user_email,
+             s.datetime, m.title as movie_title, h.name as hall_name
+      FROM waitlist w
+      JOIN users u ON w.user_id = u.id
+      JOIN showtimes s ON w.showtime_id = s.id
+      JOIN movies m ON s.movie_id = m.id
+      JOIN halls h ON s.hall_id = h.id
+      ORDER BY w.created_at DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Admin waitlist error:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Admin: remove a waitlist entry (must be before DELETE /:id)
+router.delete('/admin/:id', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    await pool.query('DELETE FROM waitlist WHERE id = $1', [req.params.id]);
+    res.json({ message: 'Removed from waitlist' });
+  } catch (err) {
+    console.error('Admin remove waitlist error:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Join waitlist for a showtime
 router.post('/', authenticate, async (req, res) => {
   try {
@@ -45,21 +78,6 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// Leave waitlist
-router.delete('/:id', authenticate, async (req, res) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM waitlist WHERE id = $1', [req.params.id]);
-    const entry = rows[0];
-    if (!entry) return res.status(404).json({ message: 'Not found' });
-    if (entry.user_id !== req.user.id) return res.status(403).json({ message: 'Forbidden' });
-    await pool.query('DELETE FROM waitlist WHERE id = $1', [req.params.id]);
-    res.json({ message: 'Removed from waitlist' });
-  } catch (err) {
-    console.error('Leave waitlist error:', err.message);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 // Get my waitlist
 router.get('/my', authenticate, async (req, res) => {
   try {
@@ -94,35 +112,17 @@ router.get('/check/:showtimeId', authenticate, async (req, res) => {
   }
 });
 
-// Admin: get all waitlist entries
-router.get('/admin/all', authenticate, async (req, res) => {
+// Leave waitlist
+router.delete('/:id', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
-    const { rows } = await pool.query(`
-      SELECT w.*, u.name as user_name, u.email as user_email,
-             s.datetime, m.title as movie_title, h.name as hall_name
-      FROM waitlist w
-      JOIN users u ON w.user_id = u.id
-      JOIN showtimes s ON w.showtime_id = s.id
-      JOIN movies m ON s.movie_id = m.id
-      JOIN halls h ON s.hall_id = h.id
-      ORDER BY w.created_at DESC
-    `);
-    res.json(rows);
-  } catch (err) {
-    console.error('Admin waitlist error:', err.message);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Admin: remove a waitlist entry
-router.delete('/admin/:id', authenticate, async (req, res) => {
-  try {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    const { rows } = await pool.query('SELECT * FROM waitlist WHERE id = $1', [req.params.id]);
+    const entry = rows[0];
+    if (!entry) return res.status(404).json({ message: 'Not found' });
+    if (entry.user_id !== req.user.id) return res.status(403).json({ message: 'Forbidden' });
     await pool.query('DELETE FROM waitlist WHERE id = $1', [req.params.id]);
     res.json({ message: 'Removed from waitlist' });
   } catch (err) {
-    console.error('Admin remove waitlist error:', err.message);
+    console.error('Leave waitlist error:', err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
