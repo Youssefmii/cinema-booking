@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { UserCheck, Search, CheckCircle2 } from 'lucide-react';
 
 const SEAT_COLORS = {
-  standard: { available: 'bg-slate-100 border-slate-300 text-slate-200 hover:bg-blue-100 hover:border-blue-400', selected: 'bg-blue-600 border-blue-600 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
+  standard: { available: 'bg-slate-100 border-slate-300 text-slate-900 font-bold hover:bg-blue-100 hover:border-blue-400', selected: 'bg-blue-600 border-blue-600 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
   vip:      { available: 'bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-200', selected: 'bg-amber-500 border-amber-500 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
   couple:   { available: 'bg-pink-50 border-pink-300 text-pink-700 hover:bg-pink-200', selected: 'bg-pink-500 border-pink-500 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
 };
@@ -31,7 +31,10 @@ export default function BookForUser() {
 
   // Load all showtimes once
   useEffect(() => {
-    api.get('/showtimes/all').then(r => setShowtimes(r.data));
+    api.get('/showtimes/all').then(r => {
+      const now = new Date();
+      setShowtimes(r.data.filter(s => new Date(s.datetime) > now));
+    });
   }, []);
 
   // Load seats when showtime changes
@@ -146,7 +149,7 @@ export default function BookForUser() {
               onChange={e => { setEmail(e.target.value); setResolvedUser(null); }}
               onKeyDown={e => e.key === 'Enter' && lookupUser()}
               placeholder="user@example.com"
-              className="flex-1 px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={lookupUser}
@@ -171,7 +174,7 @@ export default function BookForUser() {
           <select
             value={showtimeId}
             onChange={e => setShowtimeId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select a showtime...</option>
             {showtimes.map(s => (
