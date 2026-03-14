@@ -109,37 +109,14 @@ export default function SeatSelection() {
         <SeatGrid seats={seats} />
       </div>
 
-      {isFullyBooked ? (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6 text-center">
-          <BellRing size={36} className="mx-auto text-amber-500 mb-3" />
-          <h2 className="text-lg font-bold text-white mb-1">This show is sold out</h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Join the waitlist and we will email you instantly if a seat becomes available.
-          </p>
-          {waitlistEntry ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-2 text-green-600 font-semibold">
-                <BellRing size={18} /> You are on the waitlist
-              </div>
-              <button
-                onClick={handleLeaveWaitlist}
-                disabled={waitlistLoading}
-                className="flex items-center gap-2 mx-auto px-5 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50"
-              >
-                <BellOff size={16} /> Leave Waitlist
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleJoinWaitlist}
-              disabled={waitlistLoading}
-              className="px-8 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors disabled:opacity-50 flex items-center gap-2 mx-auto"
-            >
-              <BellRing size={18} /> {waitlistLoading ? 'Joining...' : 'Join Waitlist'}
-            </button>
-          )}
+      {isFullyBooked && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-center">
+          <h2 className="text-lg font-bold text-red-300 mb-1">This show is sold out</h2>
+          <p className="text-slate-400 text-sm">All seats are booked for this showtime.</p>
         </div>
-      ) : (
+      )}
+
+      {!isFullyBooked && (
         <>
           {selected.length > 0 && (
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
@@ -162,6 +139,41 @@ export default function SeatSelection() {
           </button>
         </>
       )}
+
+      {/* Waitlist section — always visible */}
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 mt-6">
+        <div className="flex items-center gap-3 mb-2">
+          <BellRing size={22} className="text-amber-500" />
+          <h3 className="font-bold text-white">Waitlist</h3>
+        </div>
+        <p className="text-slate-400 text-sm mb-4">
+          {isFullyBooked
+            ? 'Join the waitlist and we will email you instantly when a seat becomes available.'
+            : 'Want to be notified if better seats open up? Join the waitlist for this showtime.'}
+        </p>
+        {waitlistEntry ? (
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-green-400 font-semibold text-sm">
+              <BellRing size={16} /> You are on the waitlist
+            </div>
+            <button
+              onClick={handleLeaveWaitlist}
+              disabled={waitlistLoading}
+              className="flex items-center gap-2 px-4 py-2 border border-red-500/40 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/10 transition-colors disabled:opacity-50"
+            >
+              <BellOff size={14} /> Leave
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleJoinWaitlist}
+            disabled={waitlistLoading}
+            className="px-6 py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            <BellRing size={16} /> {waitlistLoading ? 'Joining...' : 'Join Waitlist'}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -54,22 +54,6 @@ router.post('/', authenticate, async (req, res) => {
     );
     if (existing.length > 0) return res.status(409).json({ message: 'Already on waitlist' });
 
-    // Check if showtime is actually full
-    const { rows: totalRows } = await pool.query(
-      'SELECT COUNT(*) as count FROM seats WHERE hall_id = $1',
-      [showtime.hall_id]
-    );
-    const totalSeats = parseInt(totalRows[0].count);
-
-    const { rows: bookedRows } = await pool.query(`
-      SELECT COUNT(*) as count FROM booking_seats bs
-      JOIN bookings b ON bs.booking_id = b.id
-      WHERE b.showtime_id = $1 AND b.status != 'cancelled'
-    `, [showtime_id]);
-    const bookedSeats = parseInt(bookedRows[0].count);
-
-    if (bookedSeats < totalSeats) return res.status(400).json({ message: 'Seats are still available — no need to join waitlist' });
-
     await pool.query('INSERT INTO waitlist (user_id, showtime_id) VALUES ($1, $2)', [req.user.id, showtime_id]);
     res.status(201).json({ message: 'Added to waitlist' });
   } catch (err) {
