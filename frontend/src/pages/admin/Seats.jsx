@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 const TYPE_STYLES = {
   vip:      { base: 'bg-amber-100 border-amber-400 text-amber-800',  selected: 'bg-amber-400 border-amber-500 text-white' },
   couple:   { base: 'bg-pink-100 border-pink-400 text-pink-800',     selected: 'bg-pink-400 border-pink-500 text-white'   },
-  standard: { base: 'bg-slate-100 border-slate-300 text-slate-200',  selected: 'bg-blue-500 border-blue-600 text-white'   },
+  standard: { base: 'bg-slate-100 border-slate-300 text-slate-900 font-bold',  selected: 'bg-blue-500 border-blue-600 text-white'   },
 };
 const BOOKED = 'bg-slate-200 border-slate-300 text-slate-400 opacity-60 cursor-not-allowed';
 
@@ -136,7 +136,7 @@ export default function AdminSeats() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
             {[
               { label: 'Total',    value: stats.total,    cls: 'bg-blue-500/10 text-blue-700'    },
-              { label: 'Standard', value: stats.standard, cls: 'bg-slate-100 text-slate-200' },
+              { label: 'Standard', value: stats.standard, cls: 'bg-slate-100 text-slate-900' },
               { label: 'VIP',      value: stats.vip,      cls: 'bg-amber-100 text-amber-700' },
               { label: 'Couple',   value: stats.couple,   cls: 'bg-pink-100 text-pink-700'   },
               ...(selectedShowtime ? [
@@ -202,7 +202,7 @@ export default function AdminSeats() {
                   className={`px-4 py-2 rounded-xl text-sm font-semibold border capitalize transition-colors ${
                     type === 'vip'    ? 'bg-amber-100 border-amber-400 text-amber-800 hover:bg-amber-200' :
                     type === 'couple' ? 'bg-pink-100 border-pink-400 text-pink-800 hover:bg-pink-200' :
-                                       'bg-slate-100 border-slate-300 text-slate-200 hover:bg-slate-200'
+                                       'bg-slate-100 border-slate-300 text-slate-900 hover:bg-slate-200'
                   }`}>
                   {type}
                 </button>
