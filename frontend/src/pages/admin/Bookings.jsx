@@ -120,15 +120,15 @@ export default function AdminBookings() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
           <input value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})}
             placeholder="Search reference, user, movie..."
-            className="pl-9 pr-4 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"/>
+            className="pl-9 pr-4 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"/>
         </div>
         <select value={filters.movie_id} onChange={e => setFilters({...filters, movie_id: e.target.value})}
-          className="px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          className="px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">All Movies</option>
           {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
         </select>
         <input type="date" value={filters.date} onChange={e => setFilters({...filters, date: e.target.value})}
-          className="px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          className="px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
         {(filters.movie_id || filters.date || filters.search) && (
           <button onClick={() => setFilters({ movie_id: '', date: '', search: '' })} className="flex items-center gap-1 text-slate-500 text-sm hover:text-slate-200">
             <X size={16}/> Clear

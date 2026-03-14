@@ -86,7 +86,7 @@ export default function AdminSeats() {
         <div className="flex-1 min-w-[180px]">
           <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Hall</label>
           <select value={selectedHall} onChange={e => { setSelectedHall(e.target.value); setSelectedShowtime(''); setEditingSeat(null); }}
-            className="w-full px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Select a hall</option>
             {halls.map(h => <option key={h.id} value={h.id}>{h.name} ({h.rows * h.seats_per_row} seats)</option>)}
           </select>
@@ -95,7 +95,7 @@ export default function AdminSeats() {
           <div className="flex-1 min-w-[220px]">
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Showtime — check availability</label>
             <select value={selectedShowtime} onChange={e => setSelectedShowtime(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-white/15 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">All seats (layout view)</option>
               {hallShowtimes.map(s => (
                 <option key={s.id} value={s.id}>{s.movie_title} — {format(new Date(s.datetime), 'MMM d, h:mm a')}</option>
