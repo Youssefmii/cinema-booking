@@ -4,7 +4,11 @@ import toast from 'react-hot-toast';
 import { Plus, Trash2, X, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
-const now = () => new Date().toISOString().slice(0, 16);
+const now = () => {
+  const d = new Date();
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
 const emptyForm = { movie_id: '', hall_id: '', datetime: '', price_standard: 12, price_vip: 22, price_couple: 35, recurring: false, repeat_type: 'daily', repeat_count: 7 };
 
 export default function AdminShowtimes() {

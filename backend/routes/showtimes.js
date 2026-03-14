@@ -74,6 +74,9 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
     const { movie_id, hall_id, datetime, price_standard, price_vip, price_couple } = req.body;
     if (!movie_id || !hall_id || !datetime) return res.status(400).json({ message: 'movie_id, hall_id, datetime required' });
 
+    // Reject past dates
+    if (new Date(datetime) < new Date()) return res.status(400).json({ message: 'Cannot create a showtime in the past' });
+
     // Check for overlap in same hall within 3 hours
     const { rows: overlapRows } = await pool.query(`
       SELECT id FROM showtimes
