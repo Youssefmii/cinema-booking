@@ -68,7 +68,7 @@ export default function AdminShowtimes() {
   };
 
   const del = async (id) => {
-    if (!confirm('Delete this showtime? Any associated bookings will also be removed.')) return;
+    if (!window.confirm('Delete this showtime? Any associated bookings will also be removed.')) return;
     try {
       await api.delete(`/showtimes/${id}`);
       toast.success('Showtime deleted');

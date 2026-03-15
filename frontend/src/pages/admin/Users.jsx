@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-import { Search, ShieldBan, ShieldCheck, X, UserPlus, Trash2, Ticket } from 'lucide-react';
+import { Search, ShieldBan, ShieldCheck, X, UserPlus, Trash2, Ticket, Pencil } from 'lucide-react';
 
 const emptyForm = { name: '', email: '', password: '', role: 'user' };
 
@@ -15,6 +15,8 @@ export default function AdminUsers() {
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({ id: null, name: '', email: '', role: 'user' });
 
   const load = () => api.get('/users').then(r => setUsers(r.data));
   useEffect(() => { load(); }, []);
@@ -40,6 +42,24 @@ export default function AdminUsers() {
     } catch (err) {
       toast.error(err.response?.data?.message || 'Could not delete user');
     }
+  };
+
+  const openEdit = (u) => {
+    setEditForm({ id: u.id, name: u.name, email: u.email, role: u.role });
+    setEditModal(true);
+  };
+
+  const updateUser = async e => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await api.put(`/users/${editForm.id}`, { name: editForm.name, email: editForm.email, role: editForm.role });
+      toast.success('User updated');
+      setEditModal(false);
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not update user');
+    } finally { setSaving(false); }
   };
 
   const createUser = async e => {
@@ -147,6 +167,13 @@ export default function AdminUsers() {
                   {u.role !== 'admin' && (
                     <div className="flex items-center gap-1.5">
                       <button
+                        onClick={() => openEdit(u)}
+                        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-slate-500/10 text-slate-300 hover:bg-slate-500/20 transition-colors"
+                        title="Edit user details"
+                      >
+                        <Pencil size={12}/> Edit
+                      </button>
+                      <button
                         onClick={() => navigate('/admin/book-for-user', { state: { preselectedUser: u } })}
                         className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-700 hover:bg-blue-100 transition-colors"
                         title="Book a ticket for this user"
@@ -223,6 +250,48 @@ export default function AdminUsers() {
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-70">
                   {saving ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {editModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-md shadow-xl border border-white/15">
+            <div className="flex items-center justify-between p-5 border-b border-white/15">
+              <h2 className="font-bold text-white flex items-center gap-2"><Pencil size={18}/> Edit User</h2>
+              <button onClick={() => setEditModal(false)}><X size={22} className="text-slate-400"/></button>
+            </div>
+            <form onSubmit={updateUser} className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Full Name</label>
+                <input required value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Email</label>
+                <input required type="email" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-200 mb-1">Role</label>
+                <select value={editForm.role} onChange={e => setEditForm({...editForm, role: e.target.value})}
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setEditModal(false)}
+                  className="flex-1 py-2.5 border border-white/15 rounded-xl text-slate-400 font-medium hover:bg-white/10">
+                  Cancel
+                </button>
+                <button type="submit" disabled={saving}
+                  className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-70">
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

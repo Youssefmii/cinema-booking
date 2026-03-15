@@ -71,6 +71,30 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
   }
 });
 
+// Admin: update user details
+router.put('/:id', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { name, email, role } = req.body;
+    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
+    const user = rows[0];
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (email && email.trim().toLowerCase() !== user.email) {
+      const { rows: dup } = await pool.query('SELECT id FROM users WHERE email = $1 AND id != $2', [email.trim().toLowerCase(), req.params.id]);
+      if (dup.length) return res.status(409).json({ message: 'Email already in use by another user' });
+    }
+
+    await pool.query(
+      'UPDATE users SET name = $1, email = $2, role = $3 WHERE id = $4',
+      [name || user.name, (email || user.email).trim().toLowerCase(), role || user.role, req.params.id]
+    );
+    res.json({ message: 'User updated' });
+  } catch (err) {
+    console.error('Update user error:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Admin: delete a user (cannot delete admins)
 router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
   try {

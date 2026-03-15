@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-import { UserCheck, Search, CheckCircle2 } from 'lucide-react';
+import { UserCheck, Search, CheckCircle2, Plus, Minus, ShoppingBag } from 'lucide-react';
 
 const SEAT_COLORS = {
   standard: { available: 'bg-slate-100 border-slate-300 text-slate-900 font-bold hover:bg-blue-100 hover:border-blue-400', selected: 'bg-blue-600 border-blue-600 text-white', booked: 'bg-slate-200 border-white/15 text-slate-400 cursor-not-allowed' },
@@ -26,15 +26,19 @@ export default function BookForUser() {
   const [seats, setSeats]           = useState([]);
   const [selected, setSelected]     = useState([]);
 
+  const [snacks, setSnacks]         = useState([]);
+  const [snackQty, setSnackQty]     = useState({});
+
   const [booking, setBooking]       = useState(null); // success result
   const [submitting, setSubmitting] = useState(false);
 
-  // Load all showtimes once
+  // Load all showtimes and snacks once
   useEffect(() => {
     api.get('/showtimes/all').then(r => {
       const now = new Date();
       setShowtimes(r.data.filter(s => new Date(s.datetime) > now));
     });
+    api.get('/snacks').then(r => setSnacks(r.data));
   }, []);
 
   // Load seats when showtime changes
@@ -76,7 +80,13 @@ export default function BookForUser() {
     return showtime.price_standard;
   };
 
-  const total = selected.reduce((sum, s) => sum + seatPrice(s), 0);
+  const changeSnackQty = (id, delta) => {
+    setSnackQty(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }));
+  };
+
+  const snackTotal = snacks.reduce((sum, s) => sum + (snackQty[s.id] || 0) * s.price, 0);
+  const seatTotal = selected.reduce((sum, s) => sum + seatPrice(s), 0);
+  const total = seatTotal + snackTotal;
 
   const handleBook = async () => {
     if (!resolvedUser) return toast.error('Look up a user first');
@@ -85,10 +95,15 @@ export default function BookForUser() {
 
     setSubmitting(true);
     try {
+      const selectedSnacks = Object.entries(snackQty)
+        .filter(([, qty]) => qty > 0)
+        .map(([snack_id, quantity]) => ({ snack_id: Number(snack_id), quantity }));
+
       const res = await api.post('/bookings/admin/book', {
         user_email: resolvedUser.email,
         showtime_id: Number(showtimeId),
         seat_ids: selected.map(s => s.id),
+        snacks: selectedSnacks,
       });
       setBooking(res.data);
       toast.success('Booking created!');
@@ -102,7 +117,7 @@ export default function BookForUser() {
   const reset = () => {
     setEmail(''); setResolvedUser(null);
     setShowtimeId(''); setShowtime(null);
-    setSeats([]); setSelected([]);
+    setSeats([]); setSelected([]); setSnackQty({});
     setBooking(null);
   };
 
@@ -243,6 +258,44 @@ export default function BookForUser() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Snack selection */}
+      {selected.length > 0 && snacks.length > 0 && (
+        <div className="bg-white/10 rounded-xl border border-white/15 p-5 mb-6">
+          <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+            <ShoppingBag size={18} className="text-blue-500" /> Add Snacks (Optional)
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {snacks.map(snack => {
+              const qty = snackQty[snack.id] || 0;
+              return (
+                <div key={snack.id} className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-white text-sm">{snack.name}</div>
+                    <div className="text-blue-400 font-semibold text-xs">${snack.price.toFixed(2)}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => changeSnackQty(snack.id, -1)} disabled={qty === 0}
+                      className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center text-slate-400 hover:bg-white/20 disabled:opacity-40">
+                      <Minus size={12} />
+                    </button>
+                    <span className="w-5 text-center font-semibold text-slate-200 text-sm">{qty}</span>
+                    <button onClick={() => changeSnackQty(snack.id, 1)}
+                      className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700">
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {snackTotal > 0 && (
+            <div className="mt-3 text-sm text-blue-300 font-medium">
+              Snacks total: <strong>${snackTotal.toFixed(2)}</strong>
+            </div>
+          )}
         </div>
       )}
 

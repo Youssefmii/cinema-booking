@@ -114,9 +114,13 @@ router.put('/:id', authenticate, requireAdmin, async (req, res) => {
 
 router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
   try {
+    // Delete waitlist entries for this showtime
+    await pool.query('DELETE FROM waitlist WHERE showtime_id = $1', [req.params.id]);
     // Delete related bookings first (booking_seats/booking_snacks cascade from bookings)
     const { rows: bookings } = await pool.query('SELECT id FROM bookings WHERE showtime_id = $1', [req.params.id]);
     for (const b of bookings) {
+      await pool.query('DELETE FROM booking_snacks WHERE booking_id = $1', [b.id]);
+      await pool.query('DELETE FROM booking_seats WHERE booking_id = $1', [b.id]);
       await pool.query('DELETE FROM bookings WHERE id = $1', [b.id]);
     }
     await pool.query('DELETE FROM showtimes WHERE id = $1', [req.params.id]);

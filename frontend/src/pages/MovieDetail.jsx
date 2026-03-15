@@ -79,8 +79,12 @@ export default function MovieDetail() {
       setAvgRating(rRes.data.avgRating);
     }).finally(() => setLoading(false));
 
+    // Check if user has a booking for this movie (only booked users can review)
     if (user) {
-      setCanReview(true);
+      api.get('/bookings/my').then(r => {
+        const hasBooking = r.data.some(b => String(b.movie_id) === String(id) && b.status === 'confirmed');
+        setCanReview(hasBooking);
+      }).catch(() => setCanReview(false));
     }
   }, [id, user?.id]);
 
