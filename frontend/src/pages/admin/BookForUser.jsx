@@ -66,6 +66,21 @@ export default function BookForUser() {
 
   const toggleSeat = (seat) => {
     if (seat.is_booked) return;
+
+    // Couple seats must be toggled as a pair
+    if (seat.seat_type === 'couple') {
+      const rowSeats = seats.filter(s => s.row_label === seat.row_label && s.seat_type === 'couple');
+      // If any in pair is booked, can't select
+      if (rowSeats.some(s => s.is_booked)) return;
+      const isSelected = selected.some(s => s.id === seat.id);
+      if (isSelected) {
+        setSelected(prev => prev.filter(s => !rowSeats.some(r => r.id === s.id)));
+      } else {
+        setSelected(prev => [...prev.filter(s => !rowSeats.some(r => r.id === s.id)), ...rowSeats]);
+      }
+      return;
+    }
+
     setSelected(prev =>
       prev.some(s => s.id === seat.id)
         ? prev.filter(s => s.id !== seat.id)
