@@ -14,8 +14,8 @@ export default function Register() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) { toast.error('Please enter a valid email address (e.g. user@gmail.com)'); return; }
+    const gmailRegex = /^[^\s@]+@gmail\.com$/i;
+    if (!gmailRegex.test(form.email)) { toast.error('Only Gmail addresses are allowed (e.g. yourname@gmail.com)'); return; }
     if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
     setLoading(true);
     try {
@@ -75,7 +75,7 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {[
               { label: 'Full Name', key: 'name', type: 'text', placeholder: 'John Doe' },
-              { label: 'Email', key: 'email', type: 'email', placeholder: 'you@example.com' },
+              { label: 'Email', key: 'email', type: 'email', placeholder: 'yourname@gmail.com' },
               { label: 'Password', key: 'password', type: 'password', placeholder: '••••••••' },
             ].map(f => (
               <div key={f.key}>
