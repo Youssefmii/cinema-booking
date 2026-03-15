@@ -70,7 +70,7 @@ router.post('/', authenticate, async (req, res) => {
 
     if (bookedSeats < totalSeats) return res.status(400).json({ message: 'Seats are still available — no need to join waitlist' });
 
-    await pool.query('INSERT INTO waitlist (user_id, showtime_id) VALUES ($1, $2)', [req.user.id, showtime_id]);
+    await pool.query("INSERT INTO waitlist (user_id, showtime_id, status) VALUES ($1, $2, 'waiting')", [req.user.id, showtime_id]);
     res.status(201).json({ message: 'Added to waitlist' });
   } catch (err) {
     console.error('Join waitlist error:', err.message);

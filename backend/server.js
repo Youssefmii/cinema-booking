@@ -5,10 +5,34 @@ const path = require('path');
 const fs = require('fs');
 const { startReminderJob } = require('./utils/reminders');
 
+const pool = require('./database');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Ensure waitlist table has required columns
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS waitlist (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        showtime_id INTEGER NOT NULL REFERENCES showtimes(id) ON DELETE CASCADE,
+        status VARCHAR(20) DEFAULT 'waiting',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    // Add status column if missing (for existing tables)
+    await pool.query(`
+      ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'waiting'
+    `);
+    // Fix any existing rows with NULL status
+    await pool.query(`UPDATE waitlist SET status = 'waiting' WHERE status IS NULL`);
+  } catch (err) {
+    console.error('Waitlist table migration:', err.message);
+  }
+})();
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/movies', require('./routes/movies'));
