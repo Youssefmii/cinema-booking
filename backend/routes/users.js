@@ -101,7 +101,19 @@ router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
     const { rows } = await pool.query('SELECT id, role FROM users WHERE id = $1', [req.params.id]);
     if (!rows[0]) return res.status(404).json({ message: 'User not found' });
     if (rows[0].role === 'admin') return res.status(400).json({ message: 'Cannot delete an admin account' });
-    await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+
+    const userId = req.params.id;
+    // Delete related data to avoid foreign key constraint errors
+    const { rows: bookings } = await pool.query('SELECT id FROM bookings WHERE user_id = $1', [userId]);
+    for (const b of bookings) {
+      await pool.query('DELETE FROM booking_snacks WHERE booking_id = $1', [b.id]);
+      await pool.query('DELETE FROM booking_seats WHERE booking_id = $1', [b.id]);
+    }
+    await pool.query('DELETE FROM bookings WHERE user_id = $1', [userId]);
+    await pool.query('DELETE FROM waitlist WHERE user_id = $1', [userId]);
+    await pool.query('DELETE FROM reviews WHERE user_id = $1', [userId]);
+    await pool.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId]);
+    await pool.query('DELETE FROM users WHERE id = $1', [userId]);
     res.json({ message: 'User deleted' });
   } catch (err) {
     console.error('Delete user error:', err.message);
