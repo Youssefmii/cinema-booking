@@ -2,7 +2,7 @@
 
 A full-stack cinema booking platform with real-time seat selection, multi-step booking flow, email confirmations, and a complete admin dashboard.
 
-**[Live Demo](https://cinema-booking-flame.vercel.app)**
+**Live Demo:** [https://cinema-booking-flame.vercel.app](https://cinema-booking-flame.vercel.app)
 
 ## Tech Stack
 
