@@ -59,10 +59,15 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
     if (existing.length) return res.status(409).json({ message: 'Email already in use' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const customerNumber = 'CUS-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    const { rows: inserted } = await pool.query(
+      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id',
+      [name.trim(), email.trim().toLowerCase(), hashed, role]
+    );
+    const newId = inserted[0].id;
+    const customerNumber = `CIN-${new Date().getFullYear()}-${String(newId).padStart(4, '0')}`;
+    await pool.query('UPDATE users SET customer_number = $1 WHERE id = $2', [customerNumber, newId]);
     const { rows } = await pool.query(
-      'INSERT INTO users (name, email, password_hash, role, customer_number) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, customer_number, created_at',
-      [name.trim(), email.trim().toLowerCase(), hashed, role, customerNumber]
+      'SELECT id, name, email, role, customer_number, created_at FROM users WHERE id = $1', [newId]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
