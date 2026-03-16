@@ -11,9 +11,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Ensure waitlist table has required columns
+// Database migrations on startup
 (async () => {
   try {
+    // Ensure waitlist table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS waitlist (
         id SERIAL PRIMARY KEY,
@@ -23,14 +24,22 @@ app.use(express.json());
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
-    // Add status column if missing (for existing tables)
-    await pool.query(`
-      ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'waiting'
-    `);
-    // Fix any existing rows with NULL status
+    await pool.query(`ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'waiting'`);
     await pool.query(`UPDATE waitlist SET status = 'waiting' WHERE status IS NULL`);
+
+    // Ensure password_reset_tokens table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token VARCHAR(255) NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL,
+        used BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
   } catch (err) {
-    console.error('Waitlist table migration:', err.message);
+    console.error('Database migration error:', err.message);
   }
 })();
 

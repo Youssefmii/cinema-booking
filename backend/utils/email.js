@@ -1,9 +1,9 @@
 const nodemailer = require("nodemailer");
 
-// Format datetime in a consistent timezone (Africa/Cairo = UTC+2 for Egypt)
-const TIMEZONE = process.env.TZ_DISPLAY || 'Africa/Cairo';
+// Format datetime — datetimes are stored as-is from the admin's input (treated as UTC by Postgres)
+// so we display in UTC to match what was originally entered
 const formatShowtime = (dt) => {
-  return new Date(dt).toLocaleString('en-US', { timeZone: TIMEZONE, dateStyle: 'short', timeStyle: 'short' });
+  return new Date(dt).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'short', timeStyle: 'short' });
 };
 
 const transporter = nodemailer.createTransport({
@@ -107,7 +107,7 @@ const sendWaitlistNotification = async ({ to, name, movie, showtime, showtimeId 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to,
-    subject: 'Seat Available -- ' + movie + ' on ' + new Date(showtime).toLocaleDateString('en-US', { timeZone: TIMEZONE }),
+    subject: 'Seat Available -- ' + movie + ' on ' + new Date(showtime).toLocaleDateString('en-US', { timeZone: 'UTC' }),
     html,
   });
 };
@@ -169,8 +169,8 @@ const sendBlacklistEmail = async ({ to, name }) => {
 const sendReminderEmail = async ({ to, name, movie, showtime, hall, seats, reference }) => {
   const seatList = seats.map(s => s.row_label + s.seat_number + ' (' + s.seat_type + ')').join(', ');
   const dt = new Date(showtime);
-  const dateStr = dt.toLocaleDateString('en-US', { timeZone: TIMEZONE, weekday: 'long', month: 'long', day: 'numeric' });
-  const timeStr = dt.toLocaleTimeString('en-US', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit' });
+  const dateStr = dt.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' });
+  const timeStr = dt.toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
 
   const html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">' +
     '<div style="background:#1a1a2e;color:white;padding:24px;text-align:center;">' +
