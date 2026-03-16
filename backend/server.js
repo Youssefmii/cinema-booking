@@ -27,6 +27,16 @@ app.use(express.json());
     await pool.query(`ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'waiting'`);
     await pool.query(`UPDATE waitlist SET status = 'waiting' WHERE status IS NULL`);
 
+    // Ensure users table has customer_number and is_blacklisted columns
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS customer_number VARCHAR(20)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blacklisted BOOLEAN DEFAULT FALSE`);
+    // Backfill customer_number for existing users that don't have one
+    const { rows: usersWithout } = await pool.query(`SELECT id FROM users WHERE customer_number IS NULL`);
+    for (const u of usersWithout) {
+      const cn = 'CUS-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      await pool.query(`UPDATE users SET customer_number = $1 WHERE id = $2`, [cn, u.id]);
+    }
+
     // Ensure password_reset_tokens table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
