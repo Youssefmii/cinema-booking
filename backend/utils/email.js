@@ -1,16 +1,19 @@
 const nodemailer = require("nodemailer");
 
-// Format datetime from raw PostgreSQL string — avoids all JS Date timezone conversion issues
+// Format datetime — parse raw PostgreSQL string and convert to display timezone
+// Raw PG strings look like: "2026-03-18 09:30:00+00" or "2026-03-18 13:30:00+00"
+const DISPLAY_TZ = process.env.DISPLAY_TIMEZONE || 'Asia/Dubai';
 const formatShowtime = (dt) => {
-  const str = String(dt);
-  // Match: "2026-03-16 22:30:00" or "2026-03-16T22:30:00.000Z" or "2026-03-16 22:30:00+00"
-  const match = str.match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
-  if (!match) return str;
-  const [, year, month, day, hour, minute] = match;
-  const h = parseInt(hour);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  return `${parseInt(month)}/${parseInt(day)}/${year.slice(2)}, ${h12}:${minute} ${ampm}`;
+  let str = String(dt);
+  // Normalize PostgreSQL format to ISO 8601 for reliable parsing
+  str = str.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00');
+  const d = new Date(str);
+  if (isNaN(d.getTime())) return String(dt);
+  return d.toLocaleString('en-US', {
+    timeZone: DISPLAY_TZ,
+    month: 'numeric', day: 'numeric', year: '2-digit',
+    hour: 'numeric', minute: '2-digit', hour12: true,
+  });
 };
 
 const transporter = nodemailer.createTransport({
@@ -114,7 +117,7 @@ const sendWaitlistNotification = async ({ to, name, movie, showtime, showtimeId 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to,
-    subject: 'Seat Available -- ' + movie + ' on ' + formatShowtime(showtime).split(',')[0],
+    subject: 'Seat Available -- ' + movie + ' on ' + formatShowtime(showtime).split(',').slice(0, -1).join(','),
     html,
   });
 };
@@ -175,13 +178,11 @@ const sendBlacklistEmail = async ({ to, name }) => {
 
 const sendReminderEmail = async ({ to, name, movie, showtime, hall, seats, reference }) => {
   const seatList = seats.map(s => s.row_label + s.seat_number + ' (' + s.seat_type + ')').join(', ');
-  const str = String(showtime);
-  const match = str.match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
-  const dateStr = match ? new Date(match[1], match[2] - 1, match[3]).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : str;
-  const h = match ? parseInt(match[4]) : 0;
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  const timeStr = match ? `${h12}:${match[5]} ${ampm}` : '';
+  let stStr = String(showtime);
+  stStr = stStr.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00');
+  const stDate = new Date(stStr);
+  const dateStr = !isNaN(stDate.getTime()) ? stDate.toLocaleDateString('en-US', { timeZone: DISPLAY_TZ, weekday: 'long', month: 'long', day: 'numeric' }) : stStr;
+  const timeStr = !isNaN(stDate.getTime()) ? stDate.toLocaleTimeString('en-US', { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit', hour12: true }) : '';
 
   const html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">' +
     '<div style="background:#1a1a2e;color:white;padding:24px;text-align:center;">' +

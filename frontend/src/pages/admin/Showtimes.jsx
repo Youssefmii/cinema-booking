@@ -42,13 +42,19 @@ export default function AdminShowtimes() {
       };
 
       if (form.recurring) {
-        // Build array of datetimes
+        // Build array of datetimes — keep the local time as-is, only change the date
         const datetimes = [];
-        const start = new Date(form.datetime);
+        const [datePart, timePart] = form.datetime.split('T');
+        const startDate = new Date(datePart + 'T00:00:00');
         const count = Math.min(Number(form.repeat_count), 60);
-        const stepMs = form.repeat_type === 'weekly' ? 7 * 24 * 3600 * 1000 : 24 * 3600 * 1000;
+        const stepDays = form.repeat_type === 'weekly' ? 7 : 1;
         for (let i = 0; i < count; i++) {
-          datetimes.push(new Date(start.getTime() + i * stepMs).toISOString());
+          const d = new Date(startDate);
+          d.setDate(d.getDate() + i * stepDays);
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          datetimes.push(`${yyyy}-${mm}-${dd}T${timePart}`);
         }
         // Create each showtime sequentially
         for (const dt of datetimes) {
