@@ -1,9 +1,16 @@
 const nodemailer = require("nodemailer");
 
-// Format datetime — datetimes are stored as-is from the admin's input (treated as UTC by Postgres)
-// so we display in UTC to match what was originally entered
+// Format datetime from raw PostgreSQL string — avoids all JS Date timezone conversion issues
 const formatShowtime = (dt) => {
-  return new Date(dt).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'short', timeStyle: 'short' });
+  const str = String(dt);
+  // Match: "2026-03-16 22:30:00" or "2026-03-16T22:30:00.000Z" or "2026-03-16 22:30:00+00"
+  const match = str.match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+  if (!match) return str;
+  const [, year, month, day, hour, minute] = match;
+  const h = parseInt(hour);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${parseInt(month)}/${parseInt(day)}/${year.slice(2)}, ${h12}:${minute} ${ampm}`;
 };
 
 const transporter = nodemailer.createTransport({
@@ -107,7 +114,7 @@ const sendWaitlistNotification = async ({ to, name, movie, showtime, showtimeId 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to,
-    subject: 'Seat Available -- ' + movie + ' on ' + new Date(showtime).toLocaleDateString('en-US', { timeZone: 'UTC' }),
+    subject: 'Seat Available -- ' + movie + ' on ' + formatShowtime(showtime).split(',')[0],
     html,
   });
 };
@@ -168,9 +175,13 @@ const sendBlacklistEmail = async ({ to, name }) => {
 
 const sendReminderEmail = async ({ to, name, movie, showtime, hall, seats, reference }) => {
   const seatList = seats.map(s => s.row_label + s.seat_number + ' (' + s.seat_type + ')').join(', ');
-  const dt = new Date(showtime);
-  const dateStr = dt.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' });
-  const timeStr = dt.toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
+  const str = String(showtime);
+  const match = str.match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+  const dateStr = match ? new Date(match[1], match[2] - 1, match[3]).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : str;
+  const h = match ? parseInt(match[4]) : 0;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  const timeStr = match ? `${h12}:${match[5]} ${ampm}` : '';
 
   const html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">' +
     '<div style="background:#1a1a2e;color:white;padding:24px;text-align:center;">' +
