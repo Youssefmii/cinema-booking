@@ -8,7 +8,7 @@ async function seed() {
   console.log('Seeding database...');
 
   // Admin user
-  const adminPass = await bcrypt.hash('admin123', 10);
+  const adminPass = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 10);
   await pool.query(
     'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
     ['Admin', 'admin@cinema.com', adminPass, 'admin']
@@ -130,7 +130,7 @@ async function seed() {
   }
 
   console.log('Seed complete!');
-  console.log('  Admin: admin@cinema.com / admin123');
+  console.log('  Admin: admin@cinema.com / youssefadmin');
   console.log('  User:  john@example.com / user123');
 
   await pool.end();
