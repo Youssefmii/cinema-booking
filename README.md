@@ -44,6 +44,48 @@ A full-stack cinema booking platform with real-time seat selection, multi-step b
 - Blacklist system for policy violations
 - Password reset via secure token
 
+## Screenshots
+
+### User Experience
+
+| Homepage | Movie Detail & Date Picker |
+|----------|---------------------------|
+| ![Homepage](screenshots/homepage.png) | ![Movie Detail](screenshots/movie-detail.png) |
+
+| Seat Selection | Snack Selection |
+|---------------|-----------------|
+| ![Seat Selection](screenshots/seat-selection.png) | ![Snack Selection](screenshots/snack-selection.png) |
+
+| Booking Confirmation | My Bookings |
+|---------------------|-------------|
+| ![Booking Confirmation](screenshots/booking-confirmation.png) | ![My Bookings](screenshots/my-bookings.png) |
+
+| Email Confirmation | Login |
+|-------------------|-------|
+| ![Email Confirmation](screenshots/email-confirmation.png) | ![Login](screenshots/login.png) |
+
+### Admin Dashboard
+
+| Dashboard | Movies Management |
+|-----------|-------------------|
+| ![Admin Dashboard](screenshots/admin-dashboard.png) | ![Admin Movies](screenshots/admin-movies.png) |
+
+| Showtimes | Halls Management |
+|-----------|-----------------|
+| ![Admin Showtimes](screenshots/admin-showtimes.png) | ![Admin Halls](screenshots/admin-halls.png) |
+
+| Bookings Management | Seat Management |
+|--------------------|-----------------|
+| ![Admin Bookings](screenshots/admin-bookings.png) | ![Admin Seats](screenshots/admin-seats.png) |
+
+| Snacks Management | Book for User |
+|-------------------|--------------|
+| ![Admin Snacks](screenshots/admin-snacks.png) | ![Book for User](screenshots/admin-book-for-user.png) |
+
+| Users Management | Waitlist |
+|-----------------|----------|
+| ![Admin Users](screenshots/admin-users.png) | ![Admin Waitlist](screenshots/admin-waitlist.png) |
+
 ## Project Structure
 
 ```
