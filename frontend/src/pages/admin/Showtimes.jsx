@@ -19,7 +19,10 @@ export default function AdminShowtimes() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
 
-  const load = () => api.get('/showtimes/all').then(r => setShowtimes(r.data));
+  const load = () => api.get('/showtimes/all').then(r => {
+    const now = new Date();
+    setShowtimes(r.data.filter(s => new Date(s.datetime) > now));
+  });
   useEffect(() => {
     load();
     api.get('/movies/all').then(r => setMovies(r.data.filter(m => m.is_active)));

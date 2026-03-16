@@ -60,6 +60,7 @@ router.put('/:id', authenticate, requireAdmin, async (req, res) => {
 
 router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
   try {
+    await pool.query('DELETE FROM booking_snacks WHERE snack_id = $1', [req.params.id]);
     await pool.query('DELETE FROM snacks WHERE id = $1', [req.params.id]);
     res.json({ message: 'Deleted' });
   } catch (err) {
