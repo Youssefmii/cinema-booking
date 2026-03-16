@@ -55,7 +55,7 @@ export default function ForgotPassword() {
                   type="email" required value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 bg-white"
-                  placeholder="you@example.com"
+                  placeholder="you@gmail.com"
                 />
               </div>
               <button

@@ -224,7 +224,7 @@ export default function AdminUsers() {
               <div>
                 <label className="block text-sm font-medium text-slate-200 mb-1">Email</label>
                 <input required type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
-                  placeholder="john@example.com"
+                  placeholder="john@gmail.com"
                   className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
               </div>
               <div>

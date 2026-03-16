@@ -1,5 +1,11 @@
 const nodemailer = require("nodemailer");
 
+// Format datetime in a consistent timezone (Africa/Cairo = UTC+2 for Egypt)
+const TIMEZONE = process.env.TZ_DISPLAY || 'Africa/Cairo';
+const formatShowtime = (dt) => {
+  return new Date(dt).toLocaleString('en-US', { timeZone: TIMEZONE, dateStyle: 'short', timeStyle: 'short' });
+};
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -23,7 +29,7 @@ const sendBookingConfirmation = async ({ to, name, reference, movie, showtime, s
     "<table style=" + JSON.stringify("width:100%; border-collapse: collapse; margin: 16px 0;") + ">" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Reference</td><td style=" + JSON.stringify("padding:10px;") + ">" + reference + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Movie</td><td style=" + JSON.stringify("padding:10px;") + ">" + movie + "</td></tr>" +
-    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + new Date(showtime).toLocaleString() + "</td></tr>" +
+    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + formatShowtime(showtime) + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Seats</td><td style=" + JSON.stringify("padding:10px;") + ">" + seatList + "</td></tr>" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Snacks</td><td style=" + JSON.stringify("padding:10px;") + ">" + snackList + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; font-size:18px;") + ">Total</td><td style=" + JSON.stringify("padding:10px; font-size:18px; color:#e63946;") + "><strong>$" + parseFloat(total).toFixed(2) + "</strong></td></tr>" +
@@ -59,7 +65,7 @@ const sendCancellationEmail = async ({ to, name, reference, movie, showtime, sea
     "<table style=" + JSON.stringify("width:100%; border-collapse: collapse; margin: 16px 0;") + ">" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Reference</td><td style=" + JSON.stringify("padding:10px;") + ">" + reference + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Movie</td><td style=" + JSON.stringify("padding:10px;") + ">" + movie + "</td></tr>" +
-    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + new Date(showtime).toLocaleString() + "</td></tr>" +
+    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + formatShowtime(showtime) + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Seats</td><td style=" + JSON.stringify("padding:10px;") + ">" + seatList + "</td></tr>" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Total Paid</td><td style=" + JSON.stringify("padding:10px;") + ">$" + parseFloat(total).toFixed(2) + "</td></tr>" +
     "</table>" +
@@ -88,7 +94,7 @@ const sendWaitlistNotification = async ({ to, name, movie, showtime, showtimeId 
     '<p>Good news! A seat has just become available for a show you were waiting for:</p>' +
     '<table style="width:100%; border-collapse: collapse; margin: 16px 0;">' +
     '<tr style="background:#f9f9f9"><td style="padding:10px; font-weight:bold;">Movie</td><td style="padding:10px;">' + movie + '</td></tr>' +
-    '<tr><td style="padding:10px; font-weight:bold;">Showtime</td><td style="padding:10px;">' + new Date(showtime).toLocaleString() + '</td></tr>' +
+    '<tr><td style="padding:10px; font-weight:bold;">Showtime</td><td style="padding:10px;">' + formatShowtime(showtime) + '</td></tr>' +
     '</table>' +
     '<p style="text-align:center; margin: 24px 0;">' +
     '<a href="' + bookingUrl + '" style="background:#2563eb; color:white; padding:12px 32px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:16px;">Book Now</a>' +
@@ -101,7 +107,7 @@ const sendWaitlistNotification = async ({ to, name, movie, showtime, showtimeId 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to,
-    subject: 'Seat Available -- ' + movie + ' on ' + new Date(showtime).toLocaleDateString(),
+    subject: 'Seat Available -- ' + movie + ' on ' + new Date(showtime).toLocaleDateString('en-US', { timeZone: TIMEZONE }),
     html,
   });
 };
@@ -121,7 +127,7 @@ const sendSeatRemovalEmail = async ({ to, name, reference, movie, showtime, remo
     "<table style=" + JSON.stringify("width:100%; border-collapse: collapse; margin: 16px 0;") + ">" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Reference</td><td style=" + JSON.stringify("padding:10px;") + ">" + reference + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Movie</td><td style=" + JSON.stringify("padding:10px;") + ">" + movie + "</td></tr>" +
-    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + new Date(showtime).toLocaleString() + "</td></tr>" +
+    "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Showtime</td><td style=" + JSON.stringify("padding:10px;") + ">" + formatShowtime(showtime) + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; color:#c0392b;") + ">Removed Seat(s)</td><td style=" + JSON.stringify("padding:10px; color:#c0392b;") + ">" + removedList + "</td></tr>" +
     "<tr style=" + JSON.stringify("background:#f9f9f9") + "><td style=" + JSON.stringify("padding:10px; font-weight:bold;") + ">Remaining Seat(s)</td><td style=" + JSON.stringify("padding:10px;") + ">" + remainingList + "</td></tr>" +
     "<tr><td style=" + JSON.stringify("padding:10px; font-weight:bold; font-size:18px;") + ">New Total</td><td style=" + JSON.stringify("padding:10px; font-size:18px; color:#e63946;") + "><strong>$" + parseFloat(newTotal).toFixed(2) + "</strong></td></tr>" +
@@ -163,8 +169,8 @@ const sendBlacklistEmail = async ({ to, name }) => {
 const sendReminderEmail = async ({ to, name, movie, showtime, hall, seats, reference }) => {
   const seatList = seats.map(s => s.row_label + s.seat_number + ' (' + s.seat_type + ')').join(', ');
   const dt = new Date(showtime);
-  const dateStr = dt.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const timeStr = dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = dt.toLocaleDateString('en-US', { timeZone: TIMEZONE, weekday: 'long', month: 'long', day: 'numeric' });
+  const timeStr = dt.toLocaleTimeString('en-US', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit' });
 
   const html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">' +
     '<div style="background:#1a1a2e;color:white;padding:24px;text-align:center;">' +
@@ -219,7 +225,7 @@ const sendBookingModifiedEmail = async ({ to, name, reference, movie, showtime, 
     '<table style="width:100%;border-collapse:collapse;margin:16px 0;">' +
     '<tr style="background:#f9f9f9"><td style="padding:10px;font-weight:bold;">Reference</td><td style="padding:10px;font-family:monospace;">' + reference + '</td></tr>' +
     '<tr><td style="padding:10px;font-weight:bold;">Movie</td><td style="padding:10px;">' + movie + '</td></tr>' +
-    '<tr style="background:#f9f9f9"><td style="padding:10px;font-weight:bold;">Showtime</td><td style="padding:10px;">' + new Date(showtime).toLocaleString() + '</td></tr>' +
+    '<tr style="background:#f9f9f9"><td style="padding:10px;font-weight:bold;">Showtime</td><td style="padding:10px;">' + formatShowtime(showtime) + '</td></tr>' +
     '<tr><td style="padding:10px;font-weight:bold;color:#dc2626;">Old Seats</td><td style="padding:10px;color:#dc2626;text-decoration:line-through;">' + oldList + '</td></tr>' +
     '<tr style="background:#f9f9f9"><td style="padding:10px;font-weight:bold;color:#16a34a;">New Seats</td><td style="padding:10px;color:#16a34a;font-weight:bold;">' + newList + '</td></tr>' +
     '<tr><td style="padding:10px;font-weight:bold;font-size:18px;">New Total</td><td style="padding:10px;font-size:18px;color:#e63946;"><strong>$' + parseFloat(newTotal).toFixed(2) + '</strong></td></tr>' +
