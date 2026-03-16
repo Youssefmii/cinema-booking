@@ -5,7 +5,7 @@ import api from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useBooking } from '../context/BookingContext';
 import { useAuth } from '../context/AuthContext';
-import { Clock, Tag, Calendar, MapPin, ChevronRight, ShieldBan, X, Star, MessageSquare, Trash2 } from 'lucide-react';
+import { Clock, Tag, Calendar, MapPin, ChevronRight, ShieldBan, X, Star, MessageSquare, Trash2, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import StarRating, { Stars } from '../components/StarRating';
 
@@ -59,6 +59,8 @@ export default function MovieDetail() {
   const [editingReview, setEditingReview] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 0, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
 
   const refreshReviews = async () => {
     const rRes = await api.get(`/movies/${id}/reviews`);
@@ -138,13 +140,19 @@ export default function MovieDetail() {
 
   const fallback = `https://placehold.co/300x450/1e3a5f/white?text=${encodeURIComponent(movie.title)}`;
 
-  // Group showtimes by date
+  // Group showtimes by date (use YYYY-MM-DD as key for reliable comparison)
   const grouped = showtimes.reduce((acc, st) => {
-    const dateKey = format(new Date(st.datetime), 'EEE, MMM d');
+    const dateKey = format(new Date(st.datetime), 'yyyy-MM-dd');
     if (!acc[dateKey]) acc[dateKey] = [];
     acc[dateKey].push(st);
     return acc;
   }, {});
+
+  const availableDates = Object.keys(grouped).sort();
+
+  // Auto-select earliest date on first load
+  const activeDateKey = selectedDate && grouped[selectedDate] ? selectedDate : availableDates[0];
+  const activeShowtimes = activeDateKey ? grouped[activeDateKey] : [];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -195,48 +203,91 @@ export default function MovieDetail() {
 
       {/* Showtimes */}
       <div>
-        <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
-          <Calendar size={20} className="text-blue-400" /> Available Showtimes
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Calendar size={20} className="text-blue-400" /> Available Showtimes
+          </h2>
 
-        {Object.keys(grouped).length === 0 ? (
+          {/* Date picker dropdown */}
+          {availableDates.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => setDateDropdownOpen(!dateDropdownOpen)}
+                className="flex items-center gap-2 bg-white/10 border border-white/20 hover:border-blue-400 rounded-xl px-4 py-2.5 text-sm font-medium text-white transition-all min-w-[200px] justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <Calendar size={15} className="text-blue-400" />
+                  {activeDateKey ? format(new Date(activeDateKey + 'T00:00:00'), 'EEEE, MMM d') : 'Select Date'}
+                </span>
+                <ChevronDown size={16} className={`text-slate-400 transition-transform ${dateDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {dateDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setDateDropdownOpen(false)} />
+                  <div className="absolute right-0 mt-2 bg-slate-800 border border-white/20 rounded-xl shadow-xl z-50 min-w-[220px] py-1 max-h-72 overflow-y-auto">
+                    {availableDates.map(dateKey => {
+                      const isActive = dateKey === activeDateKey;
+                      const count = grouped[dateKey].length;
+                      return (
+                        <button
+                          key={dateKey}
+                          onClick={() => { setSelectedDate(dateKey); setDateDropdownOpen(false); }}
+                          className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
+                            isActive
+                              ? 'bg-blue-500/20 text-blue-300'
+                              : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          <span className="font-medium">{format(new Date(dateKey + 'T00:00:00'), 'EEE, MMM d')}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${isActive ? 'bg-blue-500/30 text-blue-300' : 'bg-white/10 text-slate-400'}`}>
+                            {count} show{count !== 1 ? 's' : ''}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {availableDates.length === 0 ? (
           <div className="text-center py-12 text-slate-400 bg-white/5 rounded-xl">No showtimes available</div>
         ) : (
-          <div className="space-y-5">
-            {Object.entries(grouped).map(([date, sts]) => (
-              <div key={date}>
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">{date}</h3>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {sts.map(st => (
-                    <button
-                      key={st.id}
-                      onClick={() => handleSelect(st)}
-                      className={`flex items-center justify-between bg-white/10 border rounded-xl p-4 transition-all text-left group ${
-                        isBlacklisted
-                          ? 'border-white/10 opacity-60 cursor-not-allowed'
-                          : 'border-white/15 hover:border-blue-400 hover:bg-white/15 hover:shadow-md'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-bold text-white text-lg">{format(new Date(st.datetime), 'h:mm a')}</div>
-                        <div className="flex items-center gap-1 text-slate-400 text-sm mt-0.5">
-                          <MapPin size={13} /> {st.hall_name}
-                        </div>
-                        <div className="flex gap-3 mt-2 text-xs text-slate-400">
-                          <span>Standard <strong className="text-slate-200">${st.price_standard}</strong></span>
-                          <span>VIP <strong className="text-amber-400">${st.price_vip}</strong></span>
-                          <span>Couple <strong className="text-pink-400">${st.price_couple}</strong></span>
-                        </div>
-                      </div>
-                      {isBlacklisted
-                        ? <ShieldBan size={18} className="text-red-400 flex-shrink-0"/>
-                        : <ChevronRight size={20} className="text-slate-400 group-hover:text-blue-400 transition-colors" />
-                      }
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+              {activeDateKey && format(new Date(activeDateKey + 'T00:00:00'), 'EEEE, MMMM d')}
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {activeShowtimes.map(st => (
+                <button
+                  key={st.id}
+                  onClick={() => handleSelect(st)}
+                  className={`flex items-center justify-between bg-white/10 border rounded-xl p-4 transition-all text-left group ${
+                    isBlacklisted
+                      ? 'border-white/10 opacity-60 cursor-not-allowed'
+                      : 'border-white/15 hover:border-blue-400 hover:bg-white/15 hover:shadow-md'
+                  }`}
+                >
+                  <div>
+                    <div className="font-bold text-white text-lg">{format(new Date(st.datetime), 'h:mm a')}</div>
+                    <div className="flex items-center gap-1 text-slate-400 text-sm mt-0.5">
+                      <MapPin size={13} /> {st.hall_name}
+                    </div>
+                    <div className="flex gap-3 mt-2 text-xs text-slate-400">
+                      <span>Standard <strong className="text-slate-200">${st.price_standard}</strong></span>
+                      <span>VIP <strong className="text-amber-400">${st.price_vip}</strong></span>
+                      <span>Couple <strong className="text-pink-400">${st.price_couple}</strong></span>
+                    </div>
+                  </div>
+                  {isBlacklisted
+                    ? <ShieldBan size={18} className="text-red-400 flex-shrink-0"/>
+                    : <ChevronRight size={20} className="text-slate-400 group-hover:text-blue-400 transition-colors" />
+                  }
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
