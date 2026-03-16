@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Clock, Tag } from 'lucide-react';
+import { getGenreColors } from '../utils/genreColors';
 
 export default function MovieCard({ movie }) {
+  const genre = getGenreColors(movie.genre);
   const fallback = `https://placehold.co/300x450/1e3a5f/white?text=${encodeURIComponent(movie.title)}`;
 
   return (
@@ -13,7 +15,7 @@ export default function MovieCard({ movie }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           onError={e => { e.target.src = fallback; }}
         />
-        <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+        <div className={`absolute top-2 right-2 ${genre.bg} ${genre.text} text-xs font-semibold px-2 py-1 rounded-full`}>
           {movie.genre}
         </div>
       </div>

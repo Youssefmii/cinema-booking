@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { Clock, Tag, Calendar, MapPin, ChevronRight, ShieldBan, X, Star, MessageSquare, Trash2, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import StarRating, { Stars } from '../components/StarRating';
+import { getGenreColors } from '../utils/genreColors';
 
 function BlacklistModal({ onClose }) {
   return (
@@ -139,6 +140,7 @@ export default function MovieDetail() {
   if (!movie) return <div className="text-center py-20 text-slate-300">Movie not found</div>;
 
   const fallback = `https://placehold.co/300x450/1e3a5f/white?text=${encodeURIComponent(movie.title)}`;
+  const genre = getGenreColors(movie.genre);
 
   // Group showtimes by date (use YYYY-MM-DD as key for reliable comparison)
   const grouped = showtimes.reduce((acc, st) => {
@@ -182,7 +184,7 @@ export default function MovieDetail() {
           />
         </div>
         <div className="flex-1">
-          <span className="inline-block bg-blue-500/20 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full mb-3 border border-blue-500/30">{movie.genre}</span>
+          <span className={`inline-block ${genre.bgLight} ${genre.textLight} text-xs font-semibold px-3 py-1 rounded-full mb-3 border ${genre.border}`}>{movie.genre}</span>
           <h1 className="text-3xl font-bold text-white mb-3">{movie.title}</h1>
           <div className="flex flex-wrap gap-4 text-slate-400 text-sm mb-4">
             <span className="flex items-center gap-1"><Clock size={16} /> {movie.duration} minutes</span>
