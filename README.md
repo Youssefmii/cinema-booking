@@ -144,22 +144,3 @@ npm run dev        # runs on http://localhost:5173, proxies /api → backend
 ```
 
 Or on Windows, just double-click `start.bat` to launch both.
-
-### Demo Credentials
-
-- **Admin:** `admin@cinema.com` / `admin123`
-- **User:** `john@example.com` / `user123`
-
-### Environment Variables (backend/.env, optional)
-
-The app runs without any `.env` file. Everything below is optional:
-
-```
-JWT_SECRET=anything_you_want        # defaults to a placeholder
-ADMIN_PASSWORD=your_admin_password  # defaults to 'admin123' — used when seeding
-EMAIL_USER=your_gmail@gmail.com     # optional — enables email confirmations
-EMAIL_PASS=your_gmail_app_password  # optional
-DISPLAY_TIMEZONE=Asia/Dubai         # defaults to Asia/Dubai
-```
-
-Email is non-blocking — bookings work fine without email configured.
