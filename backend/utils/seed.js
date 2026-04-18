@@ -10,14 +10,14 @@ async function seed() {
   // Admin user
   const adminPass = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 10);
   await pool.query(
-    'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+    "INSERT OR IGNORE INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)",
     ['Admin', 'admin@cinema.com', adminPass, 'admin']
   );
 
   // Demo user
   const userPass = await bcrypt.hash('user123', 10);
   await pool.query(
-    'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+    "INSERT OR IGNORE INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)",
     ['John Doe', 'john@example.com', userPass, 'user']
   );
 
@@ -40,8 +40,10 @@ async function seed() {
   ];
 
   for (const m of movies) {
+    const { rows: existing } = await pool.query('SELECT id FROM movies WHERE title = $1', [m.title]);
+    if (existing.length) continue;
     await pool.query(
-      'INSERT INTO movies (title, genre, duration, description, poster_url) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING',
+      'INSERT INTO movies (title, genre, duration, description, poster_url) VALUES ($1, $2, $3, $4, $5)',
       [m.title, m.genre, m.duration, m.description, m.poster_url]
     );
   }
@@ -69,7 +71,7 @@ async function seed() {
         if (r === 0) type = 'vip';
         else if (s === 9 || s === 10) type = 'couple';
         await pool.query(
-          'INSERT INTO seats (hall_id, row_label, seat_number, seat_type) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+          'INSERT OR IGNORE INTO seats (hall_id, row_label, seat_number, seat_type) VALUES ($1, $2, $3, $4)',
           [hallId, ROWS[r], s, type]
         );
       }
@@ -124,16 +126,14 @@ async function seed() {
 
   for (const s of snacks) {
     await pool.query(
-      'INSERT INTO snacks (name, price, category, image_url) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+      'INSERT OR IGNORE INTO snacks (name, price, category, image_url) VALUES ($1, $2, $3, $4)',
       [s.name, s.price, s.category, s.image_url]
     );
   }
 
   console.log('Seed complete!');
-  console.log('  Admin: admin@cinema.com / youssefadmin');
+  console.log('  Admin: admin@cinema.com / ' + (process.env.ADMIN_PASSWORD || 'admin123'));
   console.log('  User:  john@example.com / user123');
-
-  await pool.end();
 }
 
 seed().catch(err => {

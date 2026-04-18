@@ -129,7 +129,7 @@ router.post('/forgot-password', async (req, res) => {
       [user.id, token, expiresAt]
     );
 
-    const resetUrl = `${process.env.FRONTEND_URL || 'https://cinema-booking-flame.vercel.app'}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}`;
     sendPasswordResetEmail({ to: user.email, name: user.name, resetUrl })
       .catch(err => console.error('Password reset email error:', err.message));
 

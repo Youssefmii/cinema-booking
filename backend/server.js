@@ -1,57 +1,15 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
 const { startReminderJob } = require('./utils/reminders');
 
-const pool = require('./database');
+// Importing the pool initializes the SQLite database and creates all tables.
+require('./database');
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-// Database migrations on startup
-(async () => {
-  try {
-    // Ensure waitlist table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS waitlist (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        showtime_id INTEGER NOT NULL REFERENCES showtimes(id) ON DELETE CASCADE,
-        status VARCHAR(20) DEFAULT 'waiting',
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `);
-    await pool.query(`ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'waiting'`);
-    await pool.query(`UPDATE waitlist SET status = 'waiting' WHERE status IS NULL`);
-
-    // Ensure users table has customer_number and is_blacklisted columns
-    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS customer_number VARCHAR(20)`);
-    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blacklisted BOOLEAN DEFAULT FALSE`);
-    // Backfill customer_number for existing users that don't have one
-    const { rows: usersWithout } = await pool.query(`SELECT id FROM users WHERE customer_number IS NULL`);
-    for (const u of usersWithout) {
-      const cn = 'CUS-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-      await pool.query(`UPDATE users SET customer_number = $1 WHERE id = $2`, [cn, u.id]);
-    }
-
-    // Ensure password_reset_tokens table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS password_reset_tokens (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        token VARCHAR(255) NOT NULL,
-        expires_at TIMESTAMPTZ NOT NULL,
-        used BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `);
-  } catch (err) {
-    console.error('Database migration error:', err.message);
-  }
-})();
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/movies', require('./routes/movies'));
@@ -66,32 +24,11 @@ app.use('/api/waitlist', require('./routes/waitlist'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-// Serve React frontend build in production
-const frontendBuild = path.join(__dirname, '../frontend/dist');
-if (fs.existsSync(frontendBuild)) {
-  // Hashed assets (JS/CSS) — cache forever
-  app.use('/assets', express.static(path.join(frontendBuild, 'assets'), {
-    maxAge: '1y',
-    immutable: true,
-  }));
-  // Everything else (index.html, vite.svg, etc.) — never cache
-  app.use(express.static(frontendBuild, { maxAge: 0 }));
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) return res.status(404).json({ message: 'Not found' });
-    res.setHeader('Cache-Control', 'no-store');
-    res.sendFile(path.join(frontendBuild, 'index.html'));
-  });
-}
-
 const PORT = process.env.PORT || 5000;
 
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    startReminderJob();
-  });
-} else {
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
   startReminderJob();
-}
+});
 
 module.exports = app;

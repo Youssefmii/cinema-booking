@@ -72,9 +72,12 @@ router.patch('/:seatId/type', authenticate, requireAdmin, async (req, res) => {
     if (seat_type === 'couple') {
       if (!inCoupleZone)
         return res.status(400).json({ message: 'Only the last 2 seats of a row can be set to couple type' });
-      // Update both seats in the couple pair
+      // Update both seats in the couple pair (SQLite: multiple placeholders instead of ANY)
       const pairIds = last2.map(s => s.id);
-      await pool.query('UPDATE seats SET seat_type = $1 WHERE id = ANY($2)', [seat_type, pairIds]);
+      await pool.query(
+        `UPDATE seats SET seat_type = $1 WHERE id IN (${pairIds.map((_, i) => '$' + (i + 2)).join(', ')})`,
+        [seat_type, ...pairIds]
+      );
       return res.json({ message: 'Both couple seats updated', updated: 2 });
     }
 

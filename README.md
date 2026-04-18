@@ -1,8 +1,6 @@
 # Cinema Booking System
 
-A full-stack cinema booking platform with real-time seat selection, multi-step booking flow, email confirmations, and a complete admin dashboard.
-
-**Live Demo:** [https://cinema-booking-flame.vercel.app](https://cinema-booking-flame.vercel.app)
+A full-stack cinema booking platform with real-time seat selection, multi-step booking flow, email confirmations, and a complete admin dashboard. Runs entirely locally — no cloud services required.
 
 ## Tech Stack
 
@@ -10,10 +8,9 @@ A full-stack cinema booking platform with real-time seat selection, multi-step b
 |-------|-----------|
 | **Frontend** | React, Vite, Tailwind CSS v4 |
 | **Backend** | Node.js, Express |
-| **Database** | PostgreSQL (Supabase) |
+| **Database** | SQLite (better-sqlite3) |
 | **Auth** | JWT (bcryptjs) |
-| **Email** | Nodemailer (Gmail SMTP) |
-| **Deployment** | Vercel (serverless) |
+| **Email** | Nodemailer (Gmail SMTP, optional) |
 
 ## Features
 
@@ -90,8 +87,9 @@ A full-stack cinema booking platform with real-time seat selection, multi-step b
 
 ```
 ├── backend/
-│   ├── server.js            # Express entry point + DB migrations
-│   ├── database.js          # PostgreSQL connection pool
+│   ├── server.js            # Express entry point
+│   ├── database.js          # SQLite connection + schema
+│   ├── cinema.db            # SQLite database file (created on first run)
 │   ├── routes/
 │   │   ├── auth.js          # Login, register, forgot/reset password
 │   │   ├── movies.js        # CRUD + reviews
@@ -103,7 +101,9 @@ A full-stack cinema booking platform with real-time seat selection, multi-step b
 │   │   ├── users.js         # Admin user management
 │   │   └── waitlist.js      # Join/leave waitlist
 │   └── utils/
-│       └── email.js         # Booking confirmation + reminder emails
+│       ├── email.js         # Booking confirmation + reminder emails
+│       ├── seed.js          # Seed movies, halls, snacks, demo users
+│       └── seed-showtimes.js # Seed extra showtimes over a date range
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/           # All route pages
@@ -111,38 +111,68 @@ A full-stack cinema booking platform with real-time seat selection, multi-step b
 │   │   ├── context/         # Auth + Booking context providers
 │   │   └── utils/           # Shared utilities (genre colors, etc.)
 │   └── vite.config.js       # Dev proxy → backend
-└── start.bat                # One-click local launcher
+└── start.bat                # One-click local launcher (Windows)
 ```
 
-## Local Development
+## Getting Started
+
+### First-time setup
+
+```bash
+# 1. Install backend dependencies
+cd backend
+npm install
+
+# 2. Seed the database (creates cinema.db with demo data)
+npm run seed
+
+# 3. Install frontend dependencies
+cd ../frontend
+npm install
+```
+
+### Running
 
 ```bash
 # Terminal 1 — Backend
 cd backend
-npm install
-npm start          # runs on port 5000
+npm start          # runs on http://localhost:5000
 
 # Terminal 2 — Frontend
 cd frontend
-npm install
-npm run dev        # runs on port 5173, proxies /api → backend
+npm run dev        # runs on http://localhost:5173, proxies /api → backend
 ```
 
-Or just double-click `start.bat` to launch both.
+Or on Windows, just double-click `start.bat` to launch both.
 
-### Environment Variables (backend/.env)
+### Demo Credentials
+
+- **Admin:** `admin@cinema.com` / `admin123`
+- **User:** `john@example.com` / `user123`
+
+### Environment Variables (backend/.env, optional)
+
+The app runs without any `.env` file. Everything below is optional:
 
 ```
-DATABASE_URL=your_postgresql_connection_string
-JWT_SECRET=your_secret_key
-EMAIL_USER=your_gmail@gmail.com
-EMAIL_PASS=your_gmail_app_password
-FRONTEND_URL=https://your-deployment-url.vercel.app
-DISPLAY_TIMEZONE=Asia/Dubai
+JWT_SECRET=anything_you_want        # defaults to a placeholder
+ADMIN_PASSWORD=your_admin_password  # defaults to 'admin123' — used when seeding
+EMAIL_USER=your_gmail@gmail.com     # optional — enables email confirmations
+EMAIL_PASS=your_gmail_app_password  # optional
+DISPLAY_TIMEZONE=Asia/Dubai         # defaults to Asia/Dubai
 ```
 
-## Database Schema
+Email is non-blocking — bookings work fine without email configured.
 
-PostgreSQL with 10 tables: `users`, `movies`, `halls`, `seats`, `showtimes`, `snacks`, `bookings`, `booking_seats`, `booking_snacks`, `waitlist`, `reviews`, `password_reset_tokens`.
+## Database
 
-All migrations run automatically on server startup via `CREATE TABLE IF NOT EXISTS`.
+SQLite database stored in `backend/cinema.db`. Schema created automatically on first run. To reset the database:
+
+```bash
+# Delete the DB file and re-seed
+cd backend
+rm cinema.db cinema.db-wal cinema.db-shm
+npm run seed
+```
+
+**Tables:** `users`, `movies`, `halls`, `seats`, `showtimes`, `snacks`, `bookings`, `booking_seats`, `booking_snacks`, `waitlist`, `reviews`, `password_reset_tokens`.

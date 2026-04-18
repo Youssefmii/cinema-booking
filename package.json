@@ -1,8 +1,6 @@
 {
   "name": "cinema-booking",
   "version": "1.0.0",
-  "scripts": {
-    "build": "echo 'Frontend already built'",
-    "start": "cd backend && node server.js"
-  }
+  "private": true,
+  "description": "Local full-stack cinema booking system (SQLite + Express + React)."
 }

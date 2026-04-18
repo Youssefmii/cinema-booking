@@ -14,14 +14,14 @@ const parseSt = s => ({
 router.get('/', async (req, res) => {
   try {
     const { movie_id } = req.query;
+    const params = [new Date().toISOString()];
     let query = `
       SELECT s.*, m.title as movie_title, m.genre, m.duration, m.poster_url, h.name as hall_name
       FROM showtimes s
       JOIN movies m ON s.movie_id = m.id
       JOIN halls h ON s.hall_id = h.id
-      WHERE m.is_active = TRUE AND s.datetime > NOW()
+      WHERE m.is_active = 1 AND s.datetime > $1
     `;
-    const params = [];
     if (movie_id) {
       params.push(movie_id);
       query += ` AND s.movie_id = $${params.length}`;
@@ -77,10 +77,10 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
     // Reject past dates
     if (new Date(datetime) < new Date()) return res.status(400).json({ message: 'Cannot create a showtime in the past' });
 
-    // Check for overlap in same hall within 3 hours
+    // Check for overlap in same hall within 3 hours (10800 seconds = 3h)
     const { rows: overlapRows } = await pool.query(`
       SELECT id FROM showtimes
-      WHERE hall_id = $1 AND ABS(EXTRACT(EPOCH FROM datetime) - EXTRACT(EPOCH FROM $2::timestamptz)) < 10800
+      WHERE hall_id = $1 AND ABS((julianday(datetime) - julianday($2)) * 86400) < 10800
     `, [hall_id, datetime]);
     if (overlapRows.length > 0) return res.status(409).json({ message: 'Showtime overlaps with existing one in this hall' });
 
