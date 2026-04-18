@@ -163,16 +163,3 @@ DISPLAY_TIMEZONE=Asia/Dubai         # defaults to Asia/Dubai
 ```
 
 Email is non-blocking — bookings work fine without email configured.
-
-## Database
-
-SQLite database stored in `backend/cinema.db`. Schema created automatically on first run. To reset the database:
-
-```bash
-# Delete the DB file and re-seed
-cd backend
-rm cinema.db cinema.db-wal cinema.db-shm
-npm run seed
-```
-
-**Tables:** `users`, `movies`, `halls`, `seats`, `showtimes`, `snacks`, `bookings`, `booking_seats`, `booking_snacks`, `waitlist`, `reviews`, `password_reset_tokens`.
